@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block titulo %}Quindío · resultados R1–R4{% endblock %}
+{% block contenido %}
+<h1>Tablas y gráficas de los requerimientos 1 a 4</h1>
+<p class="nota">
+  Las cifras y gráficas de los cuatro requerimientos, cada una con su lectura.
+  Las tablas más largas vienen colapsadas: ábralas para ver el detalle completo.
+</p>
+<ul class="sec-nav" aria-label="Ir a cada requerimiento">
+  {% for bloque in bloques %}
+  <li><a href="#{{ bloque.id }}">{{ bloque.titulo }}</a></li>
+  {% endfor %}
+</ul>
+
+{% for bloque in bloques %}
+<section id="{{ bloque.id }}">
+<h2>{{ bloque.titulo }}</h2>
+
+{% for grafica in bloque.graficas %}
+  <h3>{{ grafica.titulo }}</h3>
+  <img class="grafica" src="/resultados/archivo/{{ grafica.archivo }}" alt="{{ grafica.titulo }}">
+  <p class="nota">{{ grafica.lectura }}</p>
+{% endfor %}
+
+{% for tabla in bloque.tablas %}
+  {% if tabla.filas|length > 12 %}
+  <details class="detalle">
+    <summary>{{ tabla.titulo }} ({{ tabla.filas|length }} filas — clic para ver)</summary>
+    <p class="nota">{{ tabla.unidad }}</p>
+    <div class="tabla-scroll">
+    <table>
+      <caption>{{ tabla.unidad }}</caption>
+      <thead>
+        <tr>{% for columna in tabla.columnas %}<th>{{ columna }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for fila in tabla.filas %}
+        <tr>{% for celda in fila %}<td>{{ celda }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="nota">{{ tabla.lectura }}</p>
+  </details>
+  {% else %}
+  <h3>{{ tabla.titulo }}</h3>
+  <div class="tabla-scroll">
+  <table>
+    <caption>{{ tabla.unidad }}</caption>
+    <thead>
+      <tr>{% for columna in tabla.columnas %}<th>{{ columna }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for fila in tabla.filas %}
+      <tr>{% for celda in fila %}<td>{{ celda }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="nota">{{ tabla.lectura }}</p>
+  {% endif %}
+{% endfor %}
+
+{% for enlace in bloque.enlaces|default([]) %}
+  <p><a href="/resultados/archivo/{{ enlace.archivo }}">{{ enlace.texto }}</a></p>
+{% endfor %}
+</section>
+{% endfor %}
+{% endblock %}

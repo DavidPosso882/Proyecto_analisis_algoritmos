@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block titulo %}Quindío · aplicación local{% endblock %}
+{% block contenido %}
+<div class="hero">
+  <h1>Departamento del Quindío · aplicación local</h1>
+  <p>
+    Explorá los resultados de los requerimientos 1 a 4 y calculá al momento la
+    ruta entre dos lugares y el itinerario de un día, con los módulos propios de
+    Dijkstra con cola de prioridad, Held-Karp y la heurística voraz.
+  </p>
+</div>
+
+<div class="stats" aria-label="Resumen de datos cargados">
+  <div class="stat"><span class="cifra">{{ datos.n }}</span><span class="etiqueta">nodos del grafo</span></div>
+  <div class="stat"><span class="cifra">{{ datos.catalogo|length }}</span><span class="etiqueta">lugares del catálogo</span></div>
+  <div class="stat"><span class="cifra">{{ n_atractivos }}</span><span class="etiqueta">atractivos</span></div>
+  <div class="stat"><span class="cifra">{{ n_vertices }}</span><span class="etiqueta">vértices de la envolvente</span></div>
+</div>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <h3>Ruta origen–destino</h3>
+    <p>Elegí origen y destino y mirá la ruta en el mapa con su tiempo de viaje.</p>
+    <a href="/ruta">Calcular una ruta →</a>
+  </div>
+  <div class="tarjeta">
+    <h3>Envolvente convexa</h3>
+    <p>El contorno de la red vial sobre el mapa del departamento.</p>
+    <a href="/envolvente">Ver la envolvente →</a>
+  </div>
+  <div class="tarjeta">
+    <h3>Itinerario de un día</h3>
+    <p>Elegí partida y de 6 a 8 atractivos y compará Held-Karp con el voraz.</p>
+    <a href="/itinerario">Armar un itinerario →</a>
+  </div>
+  <div class="tarjeta">
+    <h3>Resultados R1–R4</h3>
+    <p>Tablas y gráficas de los cuatro requerimientos, con su lectura.</p>
+    <a href="/resultados">Ver las tablas y gráficas →</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block titulo %}Quindío · envolvente convexa{% endblock %}
+{% block estilos %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+{% block contenido %}
+<h1>Envolvente convexa de la red vial</h1>
+<p class="nota">
+  El contorno de la red vial, con
+  <span class="cifra-pequena">{{ vertices|length }}</span> vértices.
+</p>
+<div id="mapa"></div>
+<script id="datos-envolvente" type="application/json">{{ datos_json|tojson }}</script>
+
+<details class="detalle">
+  <summary>Ver la tabla de vértices</summary>
+  <p class="nota">Un punto por fila, con su posición geográfica para el mapa.</p>
+  <div class="tabla-scroll">
+  <table>
+    <caption>Vértices de la envolvente</caption>
+    <thead>
+      <tr><th>Orden</th><th>Nodo OSM</th><th>x UTM</th><th>y UTM</th><th>Lon</th><th>Lat</th></tr>
+    </thead>
+    <tbody>
+      {% for vertice in vertices %}
+      <tr>
+        <td>{{ vertice.orden }}</td>
+        <td>{{ vertice.nodo_id }}</td>
+        <td>{{ vertice.x_utm }}</td>
+        <td>{{ vertice.y_utm }}</td>
+        <td>{{ vertice.lon }}</td>
+        <td>{{ vertice.lat }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</details>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  (function () {
+    const bloque = document.getElementById('datos-envolvente');
+    const mapa = document.getElementById('mapa');
+    if (!bloque || !mapa) { return; }
+    if (typeof L === 'undefined') {
+      mapa.innerHTML = '<p class="nota">Sin conexión no se carga el mapa; los ' +
+        'vértices están en la tabla de abajo.</p>';
+      return;
+    }
+    const datos = JSON.parse(bloque.textContent);
+    const anillo = datos.vertices.map(function (v) { return [v.lat, v.lon]; });
+    const visor = L.map('mapa');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(visor);
+    L.polygon(anillo, { color: '#14532d', weight: 2, fillOpacity: 0.08 }).addTo(visor);
+    anillo.forEach(function (punto) {
+      L.circleMarker(punto, { radius: 4, color: '#14532d' }).addTo(visor);
+    });
+    visor.fitBounds(L.latLngBounds(anillo), { padding: [20, 20] });
+  })();
+</script>
+{% endblock %}

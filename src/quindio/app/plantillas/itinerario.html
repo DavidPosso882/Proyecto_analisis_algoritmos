@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block titulo %}Quindío · itinerario de un día{% endblock %}
+{% block contenido %}
+<h1>Itinerario de un día</h1>
+<p class="nota">
+  Elegí el lugar de partida (por defecto Armenia) y entre {{ minimo }} y {{ maximo }}
+  atractivos (6 y 8 por regla del enunciado). Vas a ver el recorrido óptimo y una
+  alternativa voraz, con sus tiempos y la diferencia. No se evalúa aquí si la
+  jornada cabe en 11 h.
+</p>
+
+{% if error %}
+<div class="error" role="alert">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="/itinerario">
+  <div class="panel">
+    <label for="partida">Lugar de partida</label>
+    <select id="partida" name="partida">
+      {% for lugar in catalogo %}
+      <option value="{{ lugar.id }}"{% if lugar.id == partida %} selected{% endif %}>
+        {{ lugar.id }} · {{ lugar.nombre }} ({{ lugar.municipio }})
+      </option>
+      {% endfor %}
+    </select>
+    <p class="nota">La partida es el punto de salida y regreso; no cuenta como atractivo.</p>
+  </div>
+
+  <div class="panel">
+    <strong>Atractivos ({{ minimo }} a {{ maximo }})</strong>
+    <div class="lista-atractivos">
+      {% for lugar in atractivos %}
+      <label>
+        <input type="checkbox" name="atractivos" value="{{ lugar.id }}"
+               {% if lugar.id in seleccion %}checked{% endif %}>
+        {{ lugar.id }} · {{ lugar.nombre }} ({{ (lugar.duracion_min|float * 60)|duracion }} de visita)
+      </label>
+      {% endfor %}
+    </div>
+    <button type="submit">Calcular itinerario</button>
+    <button type="button" id="limpiar-itinerario" class="secundario">Empezar de nuevo</button>
+  </div>
+</form>
+
+{% if resultado %}
+<script id="datos-itinerario" type="application/json">{{ datos_json|tojson }}</script>
+
+<div class="panel">
+  <p>Partida: <strong>{{ resultado.nombre_partida }}</strong> ·
+     atractivos elegidos: <strong>{{ resultado.atractivos|length }}</strong></p>
+  <div class="comparativa">
+    <div class="panel">
+      <strong>Held-Karp (óptimo)</strong>
+      <div><span class="cifra">{{ resultado.hk.jornada_s|duracion }}</span></div>
+      <div class="nota">{{ resultado.hk.desplazamientos_s|duracion }} de viaje ·
+      {{ resultado.hk.visitas_s|duracion }} de visitas</div>
+    </div>
+    <div class="panel">
+      <strong>Heurística voraz</strong>
+      <div><span class="cifra">{{ resultado.voraz.jornada_s|duracion }}</span></div>
+      <div class="nota">{{ resultado.voraz.desplazamientos_s|duracion }} de viaje ·
+      {{ resultado.voraz.visitas_s|duracion }} de visitas</div>
+    </div>
+    <div class="panel diferencia">
+      <strong>Diferencia (voraz − Held-Karp)</strong>
+      <div><span class="cifra" id="diferencia">{{ resultado.diferencia_s|duracion }}</span></div>
+      <div class="nota">Siempre ≥ 0: el óptimo es el menor tiempo posible.</div>
+    </div>
+  </div>
+</div>
+
+<details class="detalle">
+  <summary>Recorrido con Held-Karp (orden de visita óptimo)</summary>
+  <p class="nota">{{ resultado.hk.desplazamientos_s|duracion }} de
+  desplazamientos · {{ resultado.hk.visitas_s|duracion }} de visitas</p>
+  <div class="tabla-scroll">
+  <table>
+    <caption>Orden de visita óptimo · {{ resultado.hk.desplazamientos_s|duracion }} de
+    desplazamientos · {{ resultado.hk.visitas_s|duracion }} de visitas</caption>
+    <thead>
+      <tr>
+        <th>Orden</th>
+        <th>Lugar</th>
+        <th>Desplazamiento desde el anterior</th>
+        <th>Visita</th>
+        <th>Tiempo acumulado (h)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in resultado.hk.filas %}
+      <tr>
+        <td>{{ fila.orden }}</td>
+        <td>{{ fila.id }} {{ fila.lugar }}</td>
+        <td>{{ fila.desplazamiento_s|duracion }}</td>
+        <td>{% if fila.visita_s is none %}—{% else %}{{ fila.visita_s|duracion }}{% endif %}</td>
+        <td>{{ fila.acumulado_s|horas }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</details>
+
+<details class="detalle">
+  <summary>Recorrido con la heurística voraz (vecino más cercano)</summary>
+  <p class="nota">Vecino más cercano · {{ resultado.voraz.desplazamientos_s|duracion }} de
+  desplazamientos · {{ resultado.voraz.visitas_s|duracion }} de visitas</p>
+  <div class="tabla-scroll">
+  <table>
+    <caption>Vecino más cercano · {{ resultado.voraz.desplazamientos_s|duracion }} de
+    desplazamientos · {{ resultado.voraz.visitas_s|duracion }} de visitas</caption>
+    <thead>
+      <tr>
+        <th>Orden</th>
+        <th>Lugar</th>
+        <th>Desplazamiento desde el anterior</th>
+        <th>Visita</th>
+        <th>Tiempo acumulado (h)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in resultado.voraz.filas %}
+      <tr>
+        <td>{{ fila.orden }}</td>
+        <td>{{ fila.id }} {{ fila.lugar }}</td>
+        <td>{{ fila.desplazamiento_s|duracion }}</td>
+        <td>{% if fila.visita_s is none %}—{% else %}{{ fila.visita_s|duracion }}{% endif %}</td>
+        <td>{{ fila.acumulado_s|horas }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</details>
+{% endif %}
+<script>
+  // "Empezar de nuevo": borra el itinerario guardado y muestra el formulario vacío.
+  (function () {
+    var boton = document.getElementById('limpiar-itinerario');
+    if (!boton) { return; }
+    boton.addEventListener('click', function () {
+      try { sessionStorage.removeItem('quindio-itinerario'); } catch (e) {}
+      location.href = '/itinerario';
+    });
+  })();
+</script>
+{% if resultado %}
+<script>
+  // Guarda el itinerario calculado para reponerlo al volver a esta pestaña.
+  (function () {
+    try {
+      var sel = [];
+      document.querySelectorAll('input[name="atractivos"]:checked').forEach(function (c) {
+        sel.push(c.value);
+      });
+      sessionStorage.setItem('quindio-itinerario', JSON.stringify({
+        partida: document.getElementById('partida').value, atractivos: sel
+      }));
+    } catch (e) { /* sin almacenamiento: se sigue sin guardar */ }
+  })();
+</script>
+{% elif not error %}
+<script>
+  // Al volver a esta pestaña sin estado en el servidor, repone la última
+  // selección y la recalcula (el servidor la valida igual que un envío manual).
+  (function () {
+    function esId(v) { return typeof v === 'string' && /^[A-Z0-9]+$/.test(v); }
+    var form = document.querySelector('form[action="/itinerario"]');
+    var selPartida = document.getElementById('partida');
+    if (!form || !selPartida) { return; }
+    var guardado = null;
+    try { guardado = JSON.parse(sessionStorage.getItem('quindio-itinerario')); } catch (e) {}
+    if (!guardado || !esId(guardado.partida) ||
+        !guardado.atractivos || !guardado.atractivos.length) { return; }
+    if (form.querySelector('option[value="' + guardado.partida + '"]')) {
+      selPartida.value = guardado.partida;
+    }
+    var repuestos = 0;
+    guardado.atractivos.forEach(function (id) {
+      if (!esId(id)) { return; }
+      var c = form.querySelector('input[name="atractivos"][value="' + id + '"]');
+      if (c) { c.checked = true; repuestos++; }
+    });
+    if (repuestos >= 6) { form.submit(); }
+  })();
+</script>
+{% endif %}
+{% endblock %}

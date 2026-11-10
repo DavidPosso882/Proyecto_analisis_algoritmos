@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block titulo %}Quindío · ruta origen–destino{% endblock %}
+{% block estilos %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+{% block contenido %}
+<h1>Ruta entre dos lugares del catálogo</h1>
+<p class="nota">
+  El tiempo de viaje se calcula al momento para el par elegido.
+</p>
+
+<form class="filtros" method="get" action="/ruta">
+  <div>
+    <label for="origen">Origen</label>
+    <select id="origen" name="origen">
+      {% for lugar in catalogo %}
+      <option value="{{ lugar.id }}"{% if lugar.id == origen %} selected{% endif %}>
+        {{ lugar.id }} · {{ lugar.nombre }} ({{ lugar.municipio }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="destino">Destino</label>
+    <select id="destino" name="destino">
+      {% for lugar in catalogo %}
+      <option value="{{ lugar.id }}"{% if lugar.id == destino %} selected{% endif %}>
+        {{ lugar.id }} · {{ lugar.nombre }} ({{ lugar.municipio }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit">Calcular ruta</button>
+</form>
+
+{% if resultado.alcanzable %}
+<div class="panel">
+  <div class="resultado-destacado">
+    <div>
+      <div class="etiqueta" style="font-size:.8rem;color:var(--muted)">Tiempo de viaje</div>
+      <span class="tiempo-grande" id="tiempo-viaje" data-segundos="{{ resultado.tiempo_s }}">
+        {{ resultado.tiempo_s|duracion }}
+      </span>
+    </div>
+    <div class="nota" style="margin:0">{{ resultado.origen }} → {{ resultado.destino }}</div>
+  </div>
+</div>
+<div id="mapa"></div>
+<script id="datos-ruta" type="application/json">{{ datos_json|tojson }}</script>
+<details class="detalle">
+  <summary>Detalles técnicos del cálculo</summary>
+  <p class="nota">
+    Nodos explorados: {{ resultado.nodos_explorados }} · nodos de la ruta:
+    {{ resultado.ruta_nodos|length }}.
+  </p>
+</details>
+{% else %}
+<div class="error">No hay camino dirigido entre esos dos lugares en la componente.</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  (function () {
+    const bloque = document.getElementById('datos-ruta');
+    const mapa = document.getElementById('mapa');
+    if (!bloque || !mapa) { return; }
+    if (typeof L === 'undefined') {
+      mapa.innerHTML = '<p class="nota">Sin conexión no se cargan las teselas ni ' +
+        'la biblioteca del mapa; el tiempo y la ruta calculados están arriba.</p>';
+      return;
+    }
+    const datos = JSON.parse(bloque.textContent);
+    const puntos = datos.puntos.map(function (p) { return [p[1], p[0]]; });
+    const visor = L.map('mapa');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(visor);
+    L.polyline(puntos, { color: '#c0392b', weight: 4 }).addTo(visor);
+    L.circleMarker(puntos[0], { radius: 6, color: '#14532d' }).addTo(visor)
+      .bindPopup('Origen: ' + datos.origen);
+    L.circleMarker(puntos[puntos.length - 1], { radius: 6, color: '#1d4ed8' })
+      .addTo(visor).bindPopup('Destino: ' + datos.destino);
+    visor.fitBounds(L.latLngBounds(puntos), { padding: [20, 20] });
+  })();
+</script>
+<script>
+  // Conserva la última ruta calculada al navegar por pestañas (R5-02 intacto:
+  // el servidor sigue calculando; esto solo repone los selects y reenvía).
+  (function () {
+    var CLAVE = 'quindio-ruta';
+    var form = document.querySelector('form.filtros');
+    var selOrigen = document.getElementById('origen');
+    var selDestino = document.getElementById('destino');
+    if (!form || !selOrigen || !selDestino) { return; }
+    function existe(sel, valor) {
+      return !!sel.querySelector('option[value="' + valor + '"]');
+    }
+    form.addEventListener('submit', function () {
+      try {
+        sessionStorage.setItem(CLAVE, JSON.stringify({
+          origen: selOrigen.value, destino: selDestino.value
+        }));
+      } catch (e) { /* almacenamiento no disponible: se sigue sin guardar */ }
+    });
+    var params = new URLSearchParams(location.search);
+    if (params.has('origen') || params.has('destino')) { return; }
+    var guardado = null;
+    try { guardado = JSON.parse(sessionStorage.getItem(CLAVE)); } catch (e) {}
+    if (guardado && existe(selOrigen, guardado.origen) &&
+        existe(selDestino, guardado.destino)) {
+      selOrigen.value = guardado.origen;
+      selDestino.value = guardado.destino;
+      form.submit();
+    }
+  })();
+</script>
+{% endblock %}
