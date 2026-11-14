@@ -124,12 +124,54 @@ departamento: el algoritmo es lineal en V + E y las dos redes tienen un tamaño
 de entrada casi igual (28 864 frente a 29 003), no porque cubran la misma zona.
 
 **Discusión.** Trabajar solo con la componente evita respuestas «sin camino» en
-R2 y R4 y reduce el grafo en 16 nodos y 21 aristas. La asociación lugar→nodo se
-hizo por vecino más cercano euclidiano en UTM 18N; los lugares a más de 500 m se
-reportan y se conservan con decisión registrada. El caso extremo es A12 (Reserva
-Natural Acaime), a 3 522 m del nodo más cercano: se informa como fuera de la red
-pero no se elimina (DA-11), y su asociación sigue existiendo para la matriz de
-R2.
+R2 y R4 y reduce el grafo en 16 nodos y 21 aristas.
+
+**Ubicación de los lugares (R1.4).** Cada lugar del catálogo se asocia al nodo
+de la componente más cercano en línea recta, con distancia euclidiana entre
+coordenadas en metros (UTM 18N, EPSG:32618); la asociación se verifica contra un
+árbol KD de SciPy y contra la distancia geodésica (`verificacion/r1_asociacion.py`).
+
+En una primera versión del catálogo, 7 lugares quedaban a más de 500 m. Al
+revisarlos en el mapa (2026-11-14) se encontró que tres coordenadas eran
+aproximadas y se corrigieron: A13 (Barbas-Bremen) pasó de 994 m a 589 m de su
+nodo, F03 (Hotel El Edén) de 877 m a 443 m y F01 (Café San Alberto) de 526 m a
+273 m. Las otras coordenadas se confirmaron como correctas. Con el catálogo
+corregido quedan **5 lugares a más de 500 m**:
+
+| Id | Lugar | Distancia al nodo (m) | Por qué queda lejos de la red | Tratamiento |
+|---|---|---|---|---|
+| A12 | Reserva Natural Acaime | 3 522 | al final de un sendero peatonal, sin vía para carros | se conserva; limitación documentada (ver abajo) |
+| A15 | Camino Nacional del Quindío | 1 115 | sendero histórico sin acceso vehicular directo | se conserva; coordenada verificada |
+| A03 | Valle de Cocora | 1 062 | el punto del catálogo está dentro del valle, lejos del final de la vía | se conserva; coordenada verificada |
+| A13 | Parque Natural Regional Barbas-Bremen | 589 | reserva forestal; el acceso es por un camino interno | se conserva; coordenada corregida |
+| F07 | Finca Hotel La Bella Villa | 547 | finca con acceso por un carreteable interno que no está en la red | se conserva; coordenada verificada |
+
+Ningún lugar se eliminó: el enunciado exige al menos 15 atractivos y el
+catálogo tiene exactamente 15. El tratamiento común es conservar el lugar y
+asociarlo a su nodo más cercano, que funciona como el **punto de acceso por
+carretera**. La consecuencia para R2 y R4 es que el tiempo calculado llega hasta
+ese punto de acceso y **no incluye el último tramo** (a pie o por un camino
+privado). Para estos 5 lugares el tiempo del modelo subestima el tiempo real;
+para los otros 35 la diferencia es menor de 500 m.
+
+**Limitación de Acaime (A12).** Acaime y el Valle de Cocora (A03) quedan
+asociados al **mismo nodo**: el nodo vial más cercano a Acaime es el final de
+la vía del valle. En `data/procesado/asociaciones.csv` ambos lugares tienen el mismo `nodo_id`
+(1543526033). Por eso la matriz de tiempos asigna **0 s** a A03 → A12 y a
+A12 → A03, aunque en la realidad separa a los dos una caminata de varias horas.
+El grupo decidió conservar el lugar y documentar la limitación, porque la red
+modela solo vías para carros (`network_type="drive"`) y el enunciado aclara que
+el tiempo es una estimación del modelo y no el tiempo real. Los algoritmos no se
+ven afectados en su corrección, porque resuelven bien el problema sobre la
+matriz que reciben. Esto influye en los resultados en tres lugares:
+
+- R2: el par medido A12 → A09 sale desde el nodo de Cocora.
+- R4: dos instancias contienen A03 y A12 a la vez (curva con k = 9 y la
+  instancia 5 de calidad con k = 10). En ambas el tramo entre los dos cuesta
+  0 s, así que el óptimo de Held-Karp los visita seguidos.
+- Itinerario de un día: no se ve afectado, porque A12 es uno de los dos
+  atractivos que se quitan para que la jornada quepa en 11 h y A03 no está en
+  la selección.
 
 ## 3. Requerimiento 2 — Caminos mínimos
 
