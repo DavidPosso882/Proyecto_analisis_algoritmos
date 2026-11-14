@@ -4,12 +4,12 @@
   "cita_algoritmo": "Barber, Dobkin y Huhdanpaa, «The Quickhull algorithm for convex hulls», ACM TOMS 22(4), 1996; cita registrada en specs/R3.md (Spec R3a, R3-04/R3-09) y en src/quindio/envolvente/referencia.py",
   "entrada_que_exige": "ndarray de double (docstring: points : ndarray of floats / points : ndarray of double)",
   "extension": {
-    "archivo": ".venv/lib/python3.14/site-packages/scipy/spatial/_qhull.cpython-314-x86_64-linux-gnu.so",
-    "bibliotecas_enlazadas": "linux-vdso.so.1 libm.so.6 => /lib64/libm.so.6 libc.so.6 => /lib64/libc.so.6",
-    "bytes": 936024,
+    "archivo": ".venv/Lib/site-packages/scipy/spatial/_qhull.cp314-win_amd64.pyd",
+    "bibliotecas_enlazadas": "no disponible en Windows (DLL de extensión .pyd; ldd no existe)",
+    "bytes": 869376,
     "tipo": "extensión compilada de CPython (no Python puro)"
   },
-  "fecha": "2026-10-27T19:43:52.167388+00:00",
+  "fecha": "2026-11-14T22:37:48.814831+00:00",
   "fuentes_leidas": [
     {
       "cita": "The convex hull is computed using the `Qhull library <http://www.qhull.org/>`__.",
@@ -17,15 +17,15 @@
     },
     {
       "cita": "Qhull, Copyright (c) 1993-2020 C.B. Barber Arlington, MA and The National Science and Technology Research Center for Computation and Visualization of Geometric Structures (The Geometry Center) University of Minnesota email: qhull@qhull.org This software includes Qhull from C.B. Barber and The Geometry Center. Files derived from Qhull 1.0 are copyrighted by the Geometry Center.  The remaining files are copyrighted by C.B. Barber.  Qhull is free software and may be obtained via http from www.qhull.org.  It may be freely copied, modified, and redistributed under the following conditions:",
-      "fuente": "archivo instalado .venv/lib/python3.14/site-packages/scipy/spatial/qhull_src/COPYING_QHULL.txt"
+      "fuente": "archivo instalado .venv/Lib/site-packages/scipy/spatial/qhull_src/COPYING_QHULL.txt"
     },
     {
-      "cita": "extensión compilada de CPython (no Python puro); bibliotecas enlazadas: linux-vdso.so.1 libm.so.6 => /lib64/libm.so.6 libc.so.6 => /lib64/libc.so.6",
-      "fuente": "extensión compilada .venv/lib/python3.14/site-packages/scipy/spatial/_qhull.cpython-314-x86_64-linux-gnu.so"
+      "cita": "extensión compilada de CPython (no Python puro); bibliotecas enlazadas: no disponible en Windows (DLL de extensión .pyd; ldd no existe)",
+      "fuente": "extensión compilada .venv/Lib/site-packages/scipy/spatial/_qhull.cp314-win_amd64.pyd"
     }
   ],
   "lenguaje": "núcleo de Qhull en C, empaquetado como extensión compilada de CPython; la interfaz pública es Python",
-  "python": "3.14.8",
+  "python": "3.14.0",
   "requerimiento": "R3-10",
   "version_qhull_empacada": "Qhull © 1993-2020 (archivo COPYING instalado)",
   "version_registrada_por_referencia": {
