@@ -88,18 +88,44 @@ def huella_entrada(entrada):
     return hashlib.sha256(blob).hexdigest()
 
 
+def _ram_mb():
+    """RAM física en MB, en Linux/Mac (sysconf) y en Windows (API de Win32)."""
+    if hasattr(os, "sysconf"):
+        try:
+            return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") // (1024 * 1024)
+        except (ValueError, OSError):
+            return "desconocida"
+    if platform.system() == "Windows":
+        import ctypes
+
+        class _Estado(ctypes.Structure):
+            _fields_ = [
+                ("dwLength", ctypes.c_ulong),
+                ("dwMemoryLoad", ctypes.c_ulong),
+                ("ullTotalPhys", ctypes.c_ulonglong),
+                ("ullAvailPhys", ctypes.c_ulonglong),
+                ("ullTotalPageFile", ctypes.c_ulonglong),
+                ("ullAvailPageFile", ctypes.c_ulonglong),
+                ("ullTotalVirtual", ctypes.c_ulonglong),
+                ("ullAvailVirtual", ctypes.c_ulonglong),
+                ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+            ]
+
+        estado = _Estado()
+        estado.dwLength = ctypes.sizeof(_Estado)
+        if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(estado)):
+            return estado.ullTotalPhys // (1024 * 1024)
+    return "desconocida"
+
+
 def huella_maquina():
     """Huella de la máquina actual (EXP-01, EXP-14)."""
-    try:
-        ram_mb = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") // (1024 * 1024)
-    except (ValueError, OSError):
-        ram_mb = "desconocida"
     return {
         "sistema": platform.system(),
         "version_so": platform.release(),
         "cpu": platform.machine(),
         "procesador": platform.processor(),
-        "ram_mb": ram_mb,
+        "ram_mb": _ram_mb(),
         "python": platform.python_version(),
     }
 
