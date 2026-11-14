@@ -1,0 +1,29 @@
+# Manifiesto único de dependencias (REPO-08) — BORRADOR 2026-10-27
+# Una línea por paquete==versión exacta + requerimiento que lo usa.
+# Instalados verificados con `pip list` el 2026-10-27 (Python 3.14.8).
+# PENDIENTE-APROBAR: requieren consulta GLOB-16 con versiones exactas antes de instalar.
+
+# --- Verificados en el entorno (2026-10-27) ---
+networkx==3.6.1  # R1 (pesos/componente), R2-06 verificación independiente en verificacion/ (nunca en módulos medidos)
+numpy==2.5.1  # R3 (solo dtype int64 en predicados si se usa; prohibido en R2/R4 medidos)
+scipy==1.18.0  # R3-05 referencia ConvexHull en módulo separado + verificación
+shapely==2.1.2  # solo verificacion/ R3-13 (nunca en módulos medidos)
+matplotlib==3.11.1  # gráficas R2/R4 desde resultados/ (GLOB-08)
+Flask==3.1.2  # R5 DA-24 app local (aprobación David Posso 2026-10-27: PyPI + .venv, GLOB-15/16)
+# Transitorias de Flask (no directas): blinker==1.9.0 click==8.5.0 itsdangerous==2.2.0 jinja2==3.1.6 markupsafe==3.0.4 werkzeug==3.1.9
+pillow==12.3.0  # apoyo figuras (no medición)
+matplotlib==3.11.2  # R2-09/R4-09 gráficas desde CSV (herramienta de análisis; delegación chat 2026-10-27)
+# Transitorias de matplotlib (no directas): contourpy==1.4.0 cycler==0.12.1 fonttools==4.68.0 kiwisolver==1.5.1 pillow==13.0.0 pyparsing==3.3.3
+
+# --- Aprobados GLOB-16 por David Posso 2026-10-27 (chat), instalados en .venv aislado ---
+pytest==9.1.1  # DA-25 ejecutor elegido; DA-23 autoriza `pytest`/`python -m pytest`; UT-01 pruebas del arnés
+ruff==0.17.3  # DA-23 autoriza `ruff check`; análisis estático
+# Transitorias de pytest (no directas): iniconfig==2.3.1 packaging==26.3 pluggy==1.7.0 pygments==2.21.0
+
+# --- PENDIENTE-APROBAR (no instalados; GLOB-16 exige lista exacta + consulta) ---
+# --- Aprobados recomendación DA-07/08/09 (delegación chat 2026-10-27), instalados en .venv ---
+osmnx==2.1.1  # R1-01 descarga única + R1 pesos (DA-07 firmada)
+geopandas==1.2.0  # R1 preparación (transitiva de osmnx)
+pyproj==3.8.0  # R1 UTM 18N EPSG:32618 (DA-10; transitiva de osmnx)
+# Transitorias de osmnx (no directas): networkx==3.7 numpy==2.5.4 pandas==3.1.0 pyogrio==0.13.0 shapely==2.2.0 requests==2.34.2
+scipy==1.18.1  # R1-06ii árbol KD verificación + R3-05 ConvexHull (aprobación recomendadas, delegación chat 2026-10-27)

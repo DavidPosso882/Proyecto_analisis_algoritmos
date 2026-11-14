@@ -1,0 +1,38 @@
+{
+  "algoritmo": "Qhull, que implementa QuickHull",
+  "biblioteca": "scipy.spatial.ConvexHull",
+  "cita_algoritmo": "Barber, Dobkin y Huhdanpaa, «The Quickhull algorithm for convex hulls», ACM TOMS 22(4), 1996; cita registrada en specs/R3.md (Spec R3a, R3-04/R3-09) y en src/quindio/envolvente/referencia.py",
+  "entrada_que_exige": "ndarray de double (docstring: points : ndarray of floats / points : ndarray of double)",
+  "extension": {
+    "archivo": ".venv/lib/python3.14/site-packages/scipy/spatial/_qhull.cpython-314-x86_64-linux-gnu.so",
+    "bibliotecas_enlazadas": "linux-vdso.so.1 libm.so.6 => /lib64/libm.so.6 libc.so.6 => /lib64/libc.so.6",
+    "bytes": 936024,
+    "tipo": "extensión compilada de CPython (no Python puro)"
+  },
+  "fecha": "2026-10-27T19:43:52.167388+00:00",
+  "fuentes_leidas": [
+    {
+      "cita": "The convex hull is computed using the `Qhull library <http://www.qhull.org/>`__.",
+      "fuente": "docstring instalado de scipy.spatial.ConvexHull (Notes), leído desde quindio.envolvente.referencia"
+    },
+    {
+      "cita": "Qhull, Copyright (c) 1993-2020 C.B. Barber Arlington, MA and The National Science and Technology Research Center for Computation and Visualization of Geometric Structures (The Geometry Center) University of Minnesota email: qhull@qhull.org This software includes Qhull from C.B. Barber and The Geometry Center. Files derived from Qhull 1.0 are copyrighted by the Geometry Center.  The remaining files are copyrighted by C.B. Barber.  Qhull is free software and may be obtained via http from www.qhull.org.  It may be freely copied, modified, and redistributed under the following conditions:",
+      "fuente": "archivo instalado .venv/lib/python3.14/site-packages/scipy/spatial/qhull_src/COPYING_QHULL.txt"
+    },
+    {
+      "cita": "extensión compilada de CPython (no Python puro); bibliotecas enlazadas: linux-vdso.so.1 libm.so.6 => /lib64/libm.so.6 libc.so.6 => /lib64/libc.so.6",
+      "fuente": "extensión compilada .venv/lib/python3.14/site-packages/scipy/spatial/_qhull.cpython-314-x86_64-linux-gnu.so"
+    }
+  ],
+  "lenguaje": "núcleo de Qhull en C, empaquetado como extensión compilada de CPython; la interfaz pública es Python",
+  "python": "3.14.8",
+  "requerimiento": "R3-10",
+  "version_qhull_empacada": "Qhull © 1993-2020 (archivo COPYING instalado)",
+  "version_registrada_por_referencia": {
+    "algoritmo": "Qhull (Barber et al.): https://qhull.org",
+    "biblioteca": "scipy.spatial.ConvexHull",
+    "lenguaje": "C (vía Qhull), interfaz Python",
+    "version": "1.18.1"
+  },
+  "version_scipy": "1.18.1"
+}

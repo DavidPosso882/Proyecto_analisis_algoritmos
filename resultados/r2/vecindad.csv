@@ -1,0 +1,13 @@
+municipio,vecinos_le15km
+Armenia,Calarcá;Circasia;Montenegro;Quimbaya
+Buenavista,Córdoba;La Tebaida;Pijao
+Calarcá,Armenia;Circasia;Montenegro;Salento
+Circasia,Armenia;Calarcá;Filandia;Montenegro;Quimbaya;Salento
+Córdoba,Buenavista;La Tebaida;Pijao
+Filandia,Circasia;Quimbaya;Salento
+Génova,
+La Tebaida,Buenavista;Córdoba;Montenegro
+Montenegro,Armenia;Calarcá;Circasia;La Tebaida;Quimbaya
+Pijao,Buenavista;Córdoba
+Quimbaya,Armenia;Circasia;Filandia;Montenegro
+Salento,Calarcá;Circasia;Filandia

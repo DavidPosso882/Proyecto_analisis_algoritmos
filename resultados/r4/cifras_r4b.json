@@ -1,0 +1,169 @@
+{
+  "fecha": "2026-10-30T03:27:09.655177+00:00",
+  "semilla_maestra": 42,
+  "python": "3.14.8",
+  "maquina": {
+    "sistema": "Linux",
+    "version_so": "7.2.13-200.fc44.x86_64",
+    "cpu": "x86_64",
+    "procesador": "",
+    "ram_mb": 15372,
+    "python": "3.14.8"
+  },
+  "versiones": {
+    "networkx": "3.7",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "shapely": "2.2.0",
+    "matplotlib": "3.11.2"
+  },
+  "huella_matriz_tiempos": "ff74c1990780f7344d1b7117cdd00fcee08b8761622cba5bee8f49fba72977d5",
+  "huella_catalogo": "caa3be6c9bf469366f5047503da7ebe6545885c237c9613d5e6be74a5aa51f92",
+  "fuentes": {
+    "instancias": "resultados/r4/instancias.csv",
+    "curva": "resultados/r4/curva_exactos.csv",
+    "calidad": "resultados/r4/calidad_exactos.csv",
+    "itinerario": "resultados/r4/itinerario.json"
+  },
+  "comprobaciones": {
+    "R4-06_totales_optimos_iguales": true,
+    "R4-07_misma_instancia_por_k": true,
+    "R4-07_instancias_sin_armenia_y_sin_repetir": true,
+    "R4-08_mayor_k_es_el_ultimo_completado": true,
+    "R4-09_sin_puntos_no_completados": true,
+    "R4-11_brecha_negativa_ausente": true,
+    "R4-12_totales_acumulado_y_cabe": true,
+    "EXP-03_mediana_de_cinco_crudos": true,
+    "EXP-04_una_sola_medicion_si_pasa_de_un_minuto": true,
+    "EXP-08_no_completada_sin_tiempo": true
+  },
+  "curva": {
+    "convenio_nodos": "k lugares del catálogo sin Armenia + Armenia como partida (nodos = k + 1)",
+    "tiempos_crudos_por_medicion": {
+      "fuerza_bruta": {
+        "5": 5,
+        "6": 5,
+        "7": 5,
+        "8": 5,
+        "9": 5,
+        "10": 5,
+        "11": 1,
+        "12": 0
+      },
+      "held_karp": {
+        "5": 5,
+        "6": 5,
+        "7": 5,
+        "8": 5,
+        "9": 5,
+        "10": 5,
+        "11": 5,
+        "12": 5
+      }
+    },
+    "mayor_k_fuerza_bruta": 11,
+    "mayor_k_held_karp": 12,
+    "no_completadas": {
+      "fuerza_bruta": [
+        12
+      ],
+      "held_karp": []
+    },
+    "totales_optimos_iguales_k": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "puntos_graficados": {
+      "fuerza bruta": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "Held-Karp": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "unidad_tiempo": "ms"
+  },
+  "calidad": {
+    "por_k": {
+      "5": {
+        "instancias": 5,
+        "promedio": 3.3158300154522458,
+        "maximo": 5.048724945763748,
+        "minimo": 2.245316482065958
+      },
+      "8": {
+        "instancias": 5,
+        "promedio": 4.872456015952079,
+        "maximo": 11.32265194285863,
+        "minimo": 0.00902495881162524
+      },
+      "10": {
+        "instancias": 5,
+        "promedio": 10.075005565558149,
+        "maximo": 16.78779368575484,
+        "minimo": 3.128457415749325
+      },
+      "12": {
+        "instancias": 5,
+        "promedio": 11.723231351595755,
+        "maximo": 22.054922533631817,
+        "minimo": 5.74455182962643
+      }
+    },
+    "global": {
+      "instancias": 20,
+      "promedio": 7.496630737139557,
+      "maximo": 22.054922533631817,
+      "minimo": 0.00902495881162524
+    },
+    "brecha_negativa": false,
+    "tolerancia_da15": 1e-09,
+    "formula": "(heuristica - heldkarp) / heldkarp * 100"
+  },
+  "itinerario": {
+    "n_atractivos_inicial": 8,
+    "n_atractivos_final": 6,
+    "visitas_s": 25200.0,
+    "desplazamientos_s": 11092.914,
+    "jornada_s": 36292.914000000004,
+    "cabe": true,
+    "jornada_h": 10.081365000000002,
+    "partida": "Plaza de Bolívar - Armenia",
+    "quitas": [
+      "A12",
+      "A13"
+    ],
+    "firma_r4_27": "pendiente"
+  },
+  "presentacion": {
+    "decimales_min": 2,
+    "decimales_h": 3,
+    "decimales_brecha": 4,
+    "nota": "los archivos de resultados conservan segundos y porcentajes sin redondear"
+  },
+  "archivos": [
+    "tabla_exactos.csv",
+    "grafica_k_ms.png",
+    "calidad_brechas.csv",
+    "tabla_calidad.csv",
+    "tabla_itinerario.csv"
+  ]
+}

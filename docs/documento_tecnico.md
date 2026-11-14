@@ -1,0 +1,347 @@
+# Documento técnico — Red vial del Quindío, caminos mínimos, envolvente y ruta óptima
+
+> **Firmado:** David Posso, 2026-11-04. Revisión humana realizada; R5-13 (ejecución en limpio) queda como único pendiente registrado en §8.
+
+Proyecto final de Análisis de Algoritmos. Todos los algoritmos evaluables son de
+implementación propia en Python puro; las bibliotecas externas solo se usan para
+preparar datos, graficar o verificar de forma independiente (GLOB-02, GLOB-03).
+
+## 1. Arquitectura de la solución
+
+### 1.1 Diagrama de componentes
+
+```text
+                    ┌──────────────────────────────┐
+   descarga única → │ red/        R1               │ → data/crudo/
+   (OSMnx, DA-07)   │ descarga, pesos, componente, │
+                    │ asociaciones, grafo procesado│ → data/procesado/
+                    └──────────────┬───────────────┘
+                                   │ componente.graphml, grafo_idx.json,
+                                   │ indices.json, asociaciones.csv
+             ┌─────────────────────┼──────────────────────┐
+             ▼                     ▼                      ▼
+   ┌──────────────────┐  ┌──────────────────┐  ┌────────────────────┐
+   │ caminos/   R2    │  │ envolvente/  R3  │  │ recorrido/   R4    │
+   │ Dijkstra lineal  │  │ QuickHull entero │  │ fuerza bruta,      │
+   │ y con cola       │  │ + referencia     │  │ Held-Karp, voraz   │
+   └────────┬─────────┘  └────────┬─────────┘  └─────────┬──────────┘
+            │ matriz_tiempos.csv  │ vertices_red.csv     │ tablas y JSON
+            ▼                     ▼                      ▼
+                        ┌──────────────────────┐
+   data/catalogo/  ───→ │ app/  R5 (Flask)     │ ←── resultados/r1..r4/
+   catalogo.csv         │ lee y calcula al     │
+                        │ momento, no descarga │
+                        └──────────────────────┘
+```
+
+### 1.2 Flujo de datos entre requerimientos
+
+1. **R1** descarga la red, calcula pesos (distancia y tiempo), se queda con la
+   componente fuertemente conexa, asocia cada lugar del catálogo a un nodo y
+   guarda el grafo procesado con índices contiguos. Ese grafo es la única
+   entrada de R2, R3 y R4.
+2. **R2** ejecuta Dijkstra sobre la componente y produce las mediciones, la
+   matriz dirigida de tiempos 40 × 40 (`resultados/r2/matriz_tiempos.csv`) y la
+   gráfica del cociente entre versiones. La matriz alimenta a R4 y a la
+   aplicación.
+3. **R3** toma las coordenadas UTM de los nodos de la componente, las redondea a
+   enteros, elimina duplicados y calcula la envolvente con QuickHull propio;
+   guarda los vértices en `resultados/r3/vertices_red.csv` para que la
+   aplicación los dibuje sin recalcular.
+4. **R4** usa la matriz de R2 para la curva de soluciones exactas, la calidad de
+   la heurística y el itinerario de un día.
+5. **R5** (aplicación) lee el grafo procesado, el catálogo, la matriz de R2 y los
+   vértices de R3; calcula rutas e itinerarios al momento con los módulos de R2
+   y R4 y muestra las tablas y gráficas guardadas en `resultados/`.
+
+## 2. Requerimiento 1 — Modelo de la red vial
+
+**Problema.** Representar la red vial del Quindío con pesos utilizables por los
+algoritmos siguientes y quedarse solo con la parte donde existe camino dirigido
+entre cualquier par de nodos.
+
+**Representación.** Con V = 8 819 y E = 20 184 aristas (multigrafo) la matriz de
+adyacencia ocuparía ~593 MB (celdas de 8 bytes) y las listas de adyacencia
+~0,53 MB; se eligen listas de adyacencia (`cifras_r1a.json`). El detalle del
+supuesto está en ese archivo y en la sección de resultados.
+
+**Pesos.** Cada arista guarda distancia en metros y tiempo de viaje en segundos.
+La velocidad de cada tramo se imputó con la media de `maxspeed` por tipo de vía
+(la imputación de la versión instalada de OSMnx, 2.1.1); los tipos sin ningún
+`maxspeed` usan la media global y el tiempo es
+`travel_time = length / speed` (`src/quindio/red/pesos.py`). El tiempo es una
+estimación del modelo, no un tiempo real de recorrido.
+
+**Componente fuertemente conexa.** Se usa la llamada literal
+`ox.truncate.largest_component(G, strongly=True)`, que internamente aplica el
+algoritmo de Tarjan iterativo (`strongly_connected_components`, NetworkX 3.7)
+con las mejoras de Tarjan y Zwick. Complejidad **O(V + E)** en tiempo y
+**O(V)** en memoria (Tarjan, 1972, *Depth-first search and linear graph
+algorithms*, SIAM J. Comput. 1(2)).
+
+**Resultados.**
+
+| Red | Nodos | Aristas |
+|---|---|---|
+| Red descargada | 8 819 | 20 184 |
+| Componente fuertemente conexa | 8 803 | 20 163 |
+
+| Red | V | E | V + E | Tiempo (ms) |
+|---|---|---|---|---|
+| Radio de 2 km | 1 639 | 3 639 | 5 278 | 30,527 |
+| Radio de 5 km | 4 297 | 9 710 | 14 007 | 85,866 |
+| Radio de 10 km | 5 929 | 13 376 | 19 305 | 123,022 |
+| Radio de 20 km | 8 786 | 20 078 | 28 864 | 185,765 |
+| Departamento completo | 8 819 | 20 184 | 29 003 | 186,274 |
+
+*Unidad:* milisegundos, mediana de 5 ejecuciones (EXP-05); `V + E` es el tamaño
+de entrada. *Lectura:* el tiempo crece con V + E y las dos redes más grandes
+casi empatan, lo que coincide con el costo lineal esperado del algoritmo; no se
+observan saltos que sugieran otra complejidad (GLOB-10). Fuente:
+`resultados/r1/t_componente.csv`, `resultados/r1/cifras_r1a.json`.
+
+**Discusión.** Trabajar solo con la componente evita respuestas «sin camino» en
+R2 y R4 y reduce el grafo en 16 nodos y 21 aristas. La asociación lugar→nodo se
+hizo por vecino más cercano euclidiano en UTM 18N; los lugares a más de 500 m se
+reportan y se conservan con decisión registrada. El caso extremo es A12 (Reserva
+Natural Acaime), a 3 522 m del nodo más cercano: se informa como fuera de la red
+pero no se elimina (DA-11), y su asociación sigue existiendo para la matriz de
+R2.
+
+## 3. Requerimiento 2 — Caminos mínimos
+
+**Problema.** Calcular el camino de menor tiempo de viaje entre dos lugares del
+catálogo con implementación propia.
+
+**Algoritmo.** Dijkstra en dos versiones: mínimo por recorrido lineal y mínimo
+con cola de prioridad (`heapq`). Ambas se detienen al extraer el destino y
+reconstruyen la ruta por predecesores.
+
+**Correctitud.** Invariante: al extraer un nodo, su distancia ya es óptima,
+porque todo camino alternativo hacia él pasaría por un nodo no extraído de
+distancia mayor o igual. Por eso es correcto detenerse al extraer el destino. La
+condición es que los pesos sean finitos y no negativos, lo que se cumple porque
+son tiempos de viaje.
+
+**Complejidad.** Versión lineal **O(V²)** en tiempo y **O(V)** en memoria;
+versión con cola **O((V + E) log V)** en tiempo y **O(V)** en memoria (Cormen,
+Leiserson, Rivest y Stein, *Introduction to Algorithms*, 3.ª ed., §24.3; el
+costo de `heapq` se incluye según GLOB-04).
+
+**Resultados.** 20 pares medidos con la versión de cola y 10 de ellos también con
+la lineal (`resultados/r2/mediciones_anexo.csv`). La gráfica
+`resultados/r2/grafica_nodos_ms.png` tiene nodos explorados en el eje horizontal
+y tiempo en milisegundos en el vertical, con una serie por versión.
+
+| Cociente lineal / cola | Valor |
+|---|---|
+| Mediana | 149,84 |
+| Mínimo | 5,99 |
+| Máximo | 189,60 |
+
+*Unidad:* el cociente es adimensional (tiempos en ms). *Lectura:* la versión
+lineal tarda ~150 veces más en mediana, coherente con O(V²) frente a O((V + E) log V) en
+una red de 8 803 nodos; el mínimo (6x, par F05→A09) corresponde a un par cercano
+con pocos nodos explorados y el máximo (190x, A01→A02) a un par largo; la diferencia también incluye el costo de las
+estructuras de cada implementación propia. Fuente:
+`resultados/r2/cociente.json`.
+
+**Matriz de tiempos.** `resultados/r2/matriz_tiempos.csv` es dirigida y no
+simétrica (40 × 40, diagonal cero, segundos); se obtuvo con la versión de cola
+ejecutada una vez por origen sin detenerse en un destino. Es la entrada de R4 y
+del itinerario de la aplicación.
+
+**Verificación.** Las dos versiones coinciden en los 10 pares medidos con ambas
+(`verificacion/dijkstra_contra_bellmanford.py` con Bellman-Ford propio y
+`verificacion/r2_matriz.py` con NetworkX fuera de los módulos medidos).
+
+## 4. Requerimiento 3 — Envolvente convexa de la red vial
+
+**Problema.** Aproximar la extensión de la red con el menor polígono convexo que
+contiene sus nodos.
+
+**Preparación.** Coordenadas UTM 18N (EPSG:32618) redondeadas al entero más
+cercano con regla .5 hacia arriba y deduplicadas; los puntos alineados sobre los
+lados no son vértices. Los predicados usan solo aritmética entera exacta.
+
+**Algoritmo.** QuickHull (elegido por ser dividir y vencerás y por la
+distribución concentrada de la red: razón vértices/puntos medida = 0,0016).
+Fuente: Barber, Dobkin y Huhdanpaa, *The Quickhull algorithm for convex hulls*,
+ACM TOMS 22(4), 1996.
+
+**Recurrencia y complejidad.** Con m puntos a la izquierda de un segmento
+dirigido, se elige el más lejano (búsqueda lineal) y se recurre en los dos
+subconjuntos:
+
+```text
+T(m) = T(m1) + T(m2) + O(m),  con m1 + m2 ≤ m
+```
+
+Peor caso **O(n²)** en tiempo (puntos en círculo); caso esperado **O(n log n)**
+en nubes concentradas. Memoria **O(n)**. Se suma el costo del ordenamiento de
+biblioteca usado para extremos y particiones (Timsort de Python, O(n log n)).
+
+**Resultados.** `resultados/r3/tabla_anexo_r3.csv`:
+
+| Conjunto de puntos | n | Vértices | Tiempo propio (ms) | Tiempo SciPy (ms) | Cociente |
+|---|---|---|---|---|---|
+| Nodos de la red | 8 803 | 14 | 9,719 | 1,258 | 7,73 |
+| Cuadrado, 1 000 puntos | 1 000 | 17 | 1,975 | 0,430 | 4,59 |
+| Cuadrado, 10 000 puntos | 10 000 | 22 | 13,760 | 1,466 | 9,39 |
+| Cuadrado, 50 000 puntos | 50 000 | 34 | 73,127 | 6,622 | 11,04 |
+
+*Unidad:* milisegundos; `n` es tras deduplicar. *Lectura:* el tiempo propio
+crece de forma aproximadamente lineal-logarítmica y el cociente frente a SciPy
+se mantiene entre 4,6 y 11,0, con tendencia a crecer con n porque la referencia
+está compilada (Qhull en C) mientras la implementación propia es Python puro;
+los vértices coinciden con SciPy en las cuatro filas. Fuente:
+`resultados/r3/mediciones.csv`, `resultados/r3/scipy_info_r3.md`.
+
+**Uso en R5.** Los 14 vértices se guardan en
+`resultados/r3/vertices_red.csv` (coordenadas enteras UTM y lon/lat) y la
+aplicación los dibuja sin recalcular (R3-11, R5-03).
+
+## 5. Requerimiento 4 — Ruta óptima de recorrido
+
+**Problema.** Salir de un lugar del catálogo, visitar k lugares y regresar
+minimizando el tiempo total, con la matriz dirigida de R2 (TSP asimétrico).
+
+### 5.1 Soluciones exactas
+
+**Subestructura óptima.** Si al tour óptimo que sale de 0 le quito el último
+tramo j → 0, lo que queda es un camino óptimo que sale de 0, visita un
+subconjunto y termina en j; si existiera otro más barato, empalmándolo con
+j → 0 se obtendría un tour mejor, contradicción.
+
+**Recurrencia (Held-Karp).** Con C(S, j) el costo mínimo de salir de 0, visitar
+exactamente S y terminar en j:
+
+```text
+C({j}, j) = c[0][j]
+C(S, j)   = mín { C(S∖{j}, i) + c[i][j] }  para i ∈ S, i ≠ j
+óptimo    = mín { C(V∖{0}, j) + c[j][0] }  para j ≠ 0
+```
+
+**Complejidad.** Fuerza bruta **O(k!)** en tiempo y **O(k)** en memoria;
+Held-Karp **O(k²·2^k)** en tiempo y **O(k·2^k)** en memoria (Bellman, 1962,
+JACM 9(1); Held y Karp, 1962, J. SIAM 10(1)). La tabla usa k·2^k entradas de 8
+bytes (R4-05).
+
+**Resultados.** `resultados/r4/tabla_exactos.csv` y la gráfica
+`resultados/r4/grafica_k_ms.png`:
+
+| k | Fuerza bruta (ms) | Held-Karp (ms) |
+|---|---|---|
+| 5 | 0,189 | 0,095 |
+| 6 | 0,951 | 0,205 |
+| 7 | 7,058 | 0,464 |
+| 8 | 60,983 | 1,043 |
+| 9 | 588,557 | 2,456 |
+| 10 | 6 451,338 | 5,953 |
+| 11 | 73 175,226 | 14,344 |
+| 12 | no completada | 33,794 |
+
+*Unidad:* milisegundos, mediana de 5 ejecuciones. *Lectura:* la fuerza bruta
+se multiplica por 4 a 12 en cada paso de k (crecimiento factorial) y se corta en
+k = 12 por límite de tiempo, mientras Held-Karp crece como k²·2^k; el mayor k
+resuelto por ambos métodos es 11 y, en k = 5 a 11, los dos devuelven el mismo
+costo óptimo (`resultados/r4/curva_exactos.csv`, verificación R4-06), lo que
+coincide con las complejidades declaradas. Fuente:
+`resultados/r4/tabla_exactos.csv`, `resultados/r4/curva_exactos.csv`.
+
+### 5.2 Heurística voraz y su calidad
+
+Se eligió **vecino más cercano dirigido**: desde la partida se va siempre al
+lugar no visitado de menor tiempo y al final se regresa; desempate por menor
+índice. Es constructiva pura, sin mejoras no voraces, y su costo es
+**O(k²)** en tiempo y **O(k)** en memoria.
+
+| k | Instancias | Brecha promedio (%) | Brecha máxima (%) | Brecha mínima (%) |
+|---|---|---|---|---|
+| 5 | 5 | 3,3158 | 5,0487 | 2,2453 |
+| 8 | 5 | 4,8725 | 11,3227 | 0,0090 |
+| 10 | 5 | 10,0750 | 16,7878 | 3,1285 |
+| 12 | 5 | 11,7232 | 22,0549 | 5,7446 |
+
+*Unidad:* brecha en porcentaje, (heurística − Held-Karp) / Held-Karp × 100.
+*Lectura:* la brecha es no negativa porque Held-Karp es óptimo y crece con k como
+se espera de una heurística constructiva. Fuente:
+`resultados/r4/tabla_calidad.csv`, `resultados/r4/calidad_brechas.csv`.
+
+**Por qué el voraz falla aquí y no en Dijkstra.** En Dijkstra la elección voraz
+es segura porque, con pesos no negativos, la distancia mínima ya fijada no puede
+mejorarse después (subestructura óptima del camino mínimo). En el TSP la mejor
+arista inmediata puede dejar el tour atrapado en una secuencia cara: la solución
+se arma con una decisión local que no considera el resto del ciclo, como muestran
+las brechas de la tabla.
+
+### 5.3 Itinerario de un día
+
+Partida Armenia (C01, no se visita ni cuenta), selección inicial de 8 atractivos
+por sorteo con semilla derivada 42 + 900 y quitas sucesivas mientras la jornada
+supere 11 h, con el criterio escrito antes de calcular (DA-22). Resultado final:
+6 atractivos, 420 min de visitas, 184,88 min de desplazamientos y 10,081 h de
+jornada (`resultados/r4/tabla_itinerario.csv`).
+
+*Unidad:* desplazamientos y visitas en minutos, acumulado y jornada en horas.
+*Lectura:* el itinerario cabe en la jornada de 11 h tras quitar dos atractivos
+(A12 y A13), que son los que más tiempo total ahorran.
+
+**Firma humana R4-27.** David Posso, 2026-11-04: se confirman la selección inicial de 8 atractivos (A07, A04, A12, A13, A14, A10, A05, A08) y las quitas A12 y A13 por mayor ahorro de tiempo total según criterio DA-22 registrado en `resultados/r4/itinerario_criterio_previo.json`. Jornada final 10,081 h, cabe en 11 h.
+
+## 6. Requerimiento 5 — Aplicación
+
+**Alcance.** Aplicación web local (Flask 3.1.2, DA-24) que se ejecuta con
+`PYTHONPATH=src .venv/bin/python -m quindio.app` y escucha en
+`http://127.0.0.1:5000` (R5-01, R5-07).
+
+| Pantalla | Contenido | Regla |
+|---|---|---|
+| `/ruta` | origen y destino del catálogo, ruta sobre el mapa y tiempo de viaje calculados al momento con Dijkstra de cola | R5-02 |
+| `/envolvente` | polígono de la envolvente leído de `resultados/r3/vertices_red.csv` (14 vértices, igual a la fila «Nodos de la red») | R5-03 |
+| `/itinerario` | partida (por defecto Armenia) y 6 a 8 atractivos; recorrido, totales y diferencia de Held-Karp y del voraz; rechazo fuera de rango | R5-04 |
+| `/resultados` | tablas y gráficas de R1 a R4 leídas de `resultados/` con su unidad de tiempo y una lectura breve | R5-05, GLOB-08, GLOB-10 |
+
+**Bibliotecas.** El cálculo usa solo los módulos propios de R2 y R4; el marco es
+Flask y el mapa se dibuja con Leaflet sobre teselas de OpenStreetMap. La
+aplicación no importa NetworkX, OSMnx, SciPy, ni el módulo de descarga, ni el
+arnés de medición (R5-06, R5-08); una prueba estática recorre las importaciones
+del paquete y otra sustituye la descarga por un doble que falla y comprueba que
+la aplicación arranca y responde.
+
+**Trazabilidad mostrado ↔ resultados.** Las pruebas de integración fijan la
+coincidencia con los artefactos: los 20 pares de `mediciones_anexo.csv` y el
+módulo `dijkstra_cola` (R5-02), el conteo de vértices de R3-08/R3-11 (R5-03) y
+la selección final del itinerario de R4 con totales idénticos y diferencia no
+negativa (R5-04).
+
+**Riesgos.** R5-09: las teselas del mapa requieren red al usar la aplicación, lo
+que está documentado en el README; sin conexión, el tiempo de viaje, los
+vértices y las tablas siguen disponibles. R5-10: la carga de datos se midió antes
+de decidir que fuera única (0,72 s al arrancar; consultas de ruta de 7 a 18 ms) y
+no se añadió ninguna otra caché (GLOB-11).
+
+## 7. Conclusiones
+
+1. Las listas de adyacencia son la representación viable de una red de 8 803
+   nodos: la matriz de adyacencia ocuparía cientos de megabytes.
+2. La componente fuertemente conexa se obtiene en tiempo lineal en V + E y basta
+   para que todo par de lugares tenga camino dirigido.
+3. La cola de prioridad es decisiva en R2: la mediana del cociente frente a la
+   versión lineal es 149,84 en la red completa (rango 5,99–189,60 según par).
+4. QuickHull con enteros exactos reproduce los vértices de SciPy y mantiene la
+   envolvente de la red en 14 vértices.
+5. Held-Karp resuelve hasta k = 12 (fuerza bruta hasta k = 11), y la heurística
+   voraz queda entre 0,009 % y 22,05 % por encima del óptimo según k (promedio 3,3 %–11,7 %).
+6. La aplicación demuestra los resultados sin descargar ni re-medir: recalcula
+   solo lo que el enunciado pide al momento y sus cifras coinciden con los
+   archivos de resultados.
+
+## 8. Anexo de uso de inteligencia artificial
+
+El registro por tarea (herramienta y modelo, fecha, ID del plan, pedido, qué se
+aceptó, rechazó o modificó y cómo se verificó) se mantiene en
+[`docs/uso_ia.md`](uso_ia.md), conforme a REPO-07 y GLOB-25. Este anexo lo
+redactan y firman personas; el agente no certifica el uso de IA.
+
+Pendientes humanos restantes: ejecución del README en un entorno limpio (R5-13). Firmado R4-27 (David Posso, 2026-11-04), revisión y firma del documento (REPO-11) y registro del uso de IA de las tareas de cierre.
