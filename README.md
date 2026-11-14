@@ -21,10 +21,11 @@ se vuelven a medir experimentos al ejecutarla (R5-02, R5-04, R5-06, R5-08).
 - [Datos y resultados](#datos-y-resultados)
 - [Riesgos conocidos](#riesgos-conocidos)
 - [Estructura del código](#estructura-del-código)
+- [Problemas comunes en Windows](#problemas-comunes-en-windows)
 
 ## Requisitos y versiones
 
-- Python **3.14.8** (las mediciones se hicieron con esa versión).
+- Python **3.14** (probado con 3.14.8 en Linux y 3.14.0 en Windows 11).
 - Entorno virtual en `.venv/` (excluido del control de versiones).
 - El manifiesto único de dependencias es [`manifiesto.txt`](manifiesto.txt)
   (REPO-08): una línea por paquete con la versión exacta y el requerimiento que
@@ -53,13 +54,28 @@ manifiesto.
 
 ## Instalación
 
+
+**Linux / macOS**
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
-# Solo la aplicación (suficiente para ejecutarla y correr sus pruebas):
-.venv/bin/pip install Flask==3.1.2 pytest==9.1.1 ruff==0.17.3
-# Para reproducir además los experimentos de R1 a R4, instale el resto del
-# manifiesto con las versiones exactas que figuran allí.
+.venv/bin/pip install -r requirements.txt        # solo la aplicación
+.venv/bin/pip install -r requirements-dev.txt    # entorno completo (experimentos, pruebas, verificación)
+```
+
+**Windows (PowerShell)**
+
+```powershell
+git config core.autocrlf false        # antes de trabajar: evita convertir los saltos de línea de CSV y JSON
+py -3.14 -m venv .venv
+.venv\Scripts\python -m pip install --upgrade pip
+.venv\Scripts\python -m pip install -r requirements.txt       # solo la aplicación
+.venv\Scripts\python -m pip install -r requirements-dev.txt   # entorno completo
+```
+
+La instalación de Flask 3.1.2 desde PyPI fue autorizada por el usuario
+(2026-10-27) conforme a GLOB-15/GLOB-16 y DA-24.
 ```
 
 La instalación de Flask 3.1.2 desde PyPI fue autorizada por el usuario
@@ -69,6 +85,12 @@ La instalación de Flask 3.1.2 desde PyPI fue autorizada por el usuario
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m quindio.app
+```
+En Windows (PowerShell):
+
+```powershell
+$env:PYTHONPATH = "src"
+.venv\Scripts\python -m quindio.app
 ```
 
 Abre <http://127.0.0.1:5000>. Opciones: `--host` y `--puerto`
@@ -113,7 +135,20 @@ del itinerario contra `resultados/r4/itinerario.json` (R5-04). Con las
 funciones de descarga sustituidas por un doble que falla, la aplicación arranca
 y responde (R5-06).
 
+En Windows (PowerShell), con `$env:PYTHONPATH = "src"` definido en la misma ventana:
+
+```powershell
+.venv\Scripts\python -m pytest -q
+.venv\Scripts\ruff check src tests experimentos verificacion
+```
+
 ## Reproducir los experimentos
+
+En Windows se usan los mismos comandos cambiando `.venv/bin/python` por
+`.venv\Scripts\python` (por ejemplo
+`.venv\Scripts\python experimentos\r1\procesar.py`). Los scripts y el arnés
+de medición son portables: el arnés usa procesos `spawn` y obtiene la RAM
+también en Windows.
 
 Los experimentos se ejecutan **fuera** de la aplicación y escriben en
 `resultados/`. Requieren el entorno completo del manifiesto. Todas las
@@ -176,6 +211,16 @@ La aplicación lee **solo** `data/procesado/`, `data/catalogo/catalogo.csv`,
 `resultados/r2/matriz_tiempos.csv` y `resultados/r3/vertices_red.csv`; las
 tablas y gráficas de `/resultados` salen de `resultados/`. No escribe en
 ninguno de esos directorios.
+
+## Problemas comunes en Windows
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| `No module named 'quindio'` | falta `PYTHONPATH` | `$env:PYTHONPATH = "src"` en cada ventana nueva |
+| «la ejecución de scripts está deshabilitada» al activar el venv | política de PowerShell | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, o usar `.venv\Scripts\python` sin activar |
+| `git status` marca archivos como modificados sin cambios reales | Git for Windows trae `core.autocrlf=true` | `git config core.autocrlf false` y `git update-index --refresh` |
+| un archivo generado con `>` se ve ilegible en GitHub | PowerShell 5.1 escribe UTF-16 con `>` | usar `\| Out-File -Encoding ascii archivo.txt` |
+| tildes mal mostradas en la consola | página de códigos | `chcp 65001` |
 
 ## Riesgos conocidos
 
