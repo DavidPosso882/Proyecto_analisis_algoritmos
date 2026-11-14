@@ -1,0 +1,14 @@
+# Python en Windows escribe "\n" como "\r\n" en modo texto. Se guardan con LF
+# en el repositorio para que los diffs entre Linux y Windows muestren solo
+# cambios reales.
+*.py    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.html  text eol=lf
+*.toml  text eol=lf
+
+# El módulo csv escribe CRLF en todas las plataformas: no se tocan.
+*.csv     -text
+*.graphml -text
+*.png     binary
