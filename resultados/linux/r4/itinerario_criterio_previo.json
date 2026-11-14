@@ -1,0 +1,51 @@
+{
+  "fecha": "2026-10-30T03:20:47.269390+00:00",
+  "semilla_maestra": 42,
+  "python": "3.14.8",
+  "maquina": {
+    "sistema": "Linux",
+    "version_so": "7.2.13-200.fc44.x86_64",
+    "cpu": "x86_64",
+    "procesador": "",
+    "ram_mb": 15372,
+    "python": "3.14.8"
+  },
+  "versiones": {
+    "networkx": "3.7",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "shapely": "2.2.0",
+    "matplotlib": "3.11.2"
+  },
+  "huella_matriz_tiempos": "ff74c1990780f7344d1b7117cdd00fcee08b8761622cba5bee8f49fba72977d5",
+  "huella_catalogo": "caa3be6c9bf469366f5047503da7ebe6545885c237c9613d5e6be74a5aa51f92",
+  "archivo": "resultados/r4/itinerario_criterio_previo.json",
+  "partida": {
+    "id": "C01",
+    "nombre": "Plaza de Bolívar - Armenia",
+    "se_visita": false,
+    "suma_visita": false,
+    "cuenta_como_atractivo": false
+  },
+  "jornada_limite_s": 39600,
+  "criterio_seleccion": "Selección inicial: 8 atractivos (categoría «atractivo» del catálogo) por sorteo sin reemplazo con semilla derivada 42+900 (DA-17), sin mirar los tiempos de desplazamiento.",
+  "criterio_quita": "Quita (DA-22): mientras la jornada (visitas + desplazamientos, incluido el regreso) supere 11 h, se quita el atractivo cuya quita deja la menor jornada, es decir el mayor ahorro de tiempo total (visita + desplazamiento); desempate por menor id; se recalcula Held-Karp tras cada quita y se registra el ahorro como evidencia para R4-27.",
+  "semilla_seleccion": 942,
+  "seleccion_inicial": [
+    "A07",
+    "A04",
+    "A12",
+    "A13",
+    "A14",
+    "A10",
+    "A05",
+    "A08"
+  ],
+  "atractivos_iniciales": 8,
+  "firma_r4_27": {
+    "decision_humana": "R4-27: elegir atractivos y justificar las quitas",
+    "estado": "pendiente",
+    "nota": "criterios y selección registrados antes de calcular (DA-22)"
+  },
+  "orden_de_escritura": "criterio y selección antes de la primera llamada a Held-Karp"
+}
