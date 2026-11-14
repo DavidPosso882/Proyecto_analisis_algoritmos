@@ -1,14 +1,14 @@
 {
-  "fecha": "2026-10-30T03:20:47.269390+00:00",
+  "fecha": "2026-11-14T22:54:56.382562+00:00",
   "semilla_maestra": 42,
-  "python": "3.14.8",
+  "python": "3.14.0",
   "maquina": {
-    "sistema": "Linux",
-    "version_so": "7.2.13-200.fc44.x86_64",
-    "cpu": "x86_64",
-    "procesador": "",
-    "ram_mb": 15372,
-    "python": "3.14.8"
+    "sistema": "Windows",
+    "version_so": "11",
+    "cpu": "AMD64",
+    "procesador": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "ram_mb": 16149,
+    "python": "3.14.0"
   },
   "versiones": {
     "networkx": "3.7",
@@ -17,9 +17,9 @@
     "shapely": "2.2.0",
     "matplotlib": "3.11.2"
   },
-  "huella_matriz_tiempos": "ff74c1990780f7344d1b7117cdd00fcee08b8761622cba5bee8f49fba72977d5",
-  "huella_catalogo": "caa3be6c9bf469366f5047503da7ebe6545885c237c9613d5e6be74a5aa51f92",
-  "archivo": "resultados/r4/itinerario_criterio_previo.json",
+  "huella_matriz_tiempos": "a2d26dce0f07b4faf547559dfbc3c01c53819d4e6f41e91e141789a288448e1c",
+  "huella_catalogo": "53c073caacb6aaac1f7ad6c93193f4ddc48d0d6060fb63fd5649d11a1e09bfee",
+  "archivo": "resultados\\r4\\itinerario_criterio_previo.json",
   "partida": {
     "id": "C01",
     "nombre": "Plaza de Bolívar - Armenia",

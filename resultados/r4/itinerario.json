@@ -1,14 +1,14 @@
 {
-  "fecha": "2026-10-30T03:20:47.515481+00:00",
+  "fecha": "2026-11-14T22:54:56.923638+00:00",
   "semilla_maestra": 42,
-  "python": "3.14.8",
+  "python": "3.14.0",
   "maquina": {
-    "sistema": "Linux",
-    "version_so": "7.2.13-200.fc44.x86_64",
-    "cpu": "x86_64",
-    "procesador": "",
-    "ram_mb": 15372,
-    "python": "3.14.8"
+    "sistema": "Windows",
+    "version_so": "11",
+    "cpu": "AMD64",
+    "procesador": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "ram_mb": 16149,
+    "python": "3.14.0"
   },
   "versiones": {
     "networkx": "3.7",
@@ -17,10 +17,10 @@
     "shapely": "2.2.0",
     "matplotlib": "3.11.2"
   },
-  "huella_matriz_tiempos": "ff74c1990780f7344d1b7117cdd00fcee08b8761622cba5bee8f49fba72977d5",
-  "huella_catalogo": "caa3be6c9bf469366f5047503da7ebe6545885c237c9613d5e6be74a5aa51f92",
-  "archivo": "resultados/r4/itinerario.json",
-  "huella_criterio_previo": "a0610847f330998f4dff1c05a1b3a2cb1dbcfbcf294f3e794a7fbb45d1d2f082",
+  "huella_matriz_tiempos": "a2d26dce0f07b4faf547559dfbc3c01c53819d4e6f41e91e141789a288448e1c",
+  "huella_catalogo": "53c073caacb6aaac1f7ad6c93193f4ddc48d0d6060fb63fd5649d11a1e09bfee",
+  "archivo": "resultados\\r4\\itinerario.json",
+  "huella_criterio_previo": "eb6d0697aaa6f68629a9e7eb6e0e37c7dc13e4496298070d38bc2d6262218337",
   "criterio": "Quita (DA-22): mientras la jornada (visitas + desplazamientos, incluido el regreso) supere 11 h, se quita el atractivo cuya quita deja la menor jornada, es decir el mayor ahorro de tiempo total (visita + desplazamiento); desempate por menor id; se recalcula Held-Karp tras cada quita y se registra el ahorro como evidencia para R4-27.",
   "criterio_seleccion": "Selección inicial: 8 atractivos (categoría «atractivo» del catálogo) por sorteo sin reemplazo con semilla derivada 42+900 (DA-17), sin mirar los tiempos de desplazamiento.",
   "semilla_seleccion": 942,
@@ -34,10 +34,7 @@
   },
   "firma_r4_27": {
     "decision_humana": "R4-27: elegir atractivos y justificar las quitas",
-    "estado": "firmado",
-    "firmado_por": "David Posso",
-    "fecha": "2026-11-04",
-    "decision": "Se confirman seleccion inicial A07, A04, A12, A13, A14, A10, A05, A08 y quitas A12 y A13 por mayor ahorro de tiempo total (criterio DA-22). Jornada final 6 atractivos, 10,081 h, cabe en 11 h.",
+    "estado": "pendiente",
     "nota": "criterios y selección registrados antes de calcular (DA-22)"
   },
   "seleccion_inicial": [
@@ -57,35 +54,35 @@
       "A08",
       "A07",
       "A05",
-      "A10",
       "A13",
+      "A10",
       "A12",
       "A04",
       "A14",
       "C01"
     ],
     "visitas_s": 43200.0,
-    "desplazamientos_s": 15090.174,
-    "jornada_s": 58290.174,
+    "desplazamientos_s": 15728.18,
+    "jornada_s": 58928.18,
     "cabe": false
   },
   "quitas": [
     {
       "paso": 1,
-      "atractivo": "A12",
-      "nombre": "Reserva Natural Acaime",
-      "ahorro_s": 11197.259999999995,
-      "jornada_antes_s": 58290.174,
-      "jornada_despues_s": 47092.914000000004,
+      "atractivo": "A13",
+      "nombre": "Parque Natural Regional Barbas-Bremen",
+      "ahorro_s": 11438.004999999997,
+      "jornada_antes_s": 58928.18,
+      "jornada_despues_s": 47490.175,
       "atractivos_restantes": 7,
       "justificacion": "mayor ahorro de tiempo total (visita + desplazamiento) según el criterio de quita registrado antes de calcular"
     },
     {
       "paso": 2,
-      "atractivo": "A13",
-      "nombre": "Parque Natural Regional Barbas-Bremen",
-      "ahorro_s": 10800.0,
-      "jornada_antes_s": 47092.914000000004,
+      "atractivo": "A12",
+      "nombre": "Reserva Natural Acaime",
+      "ahorro_s": 11197.260999999999,
+      "jornada_antes_s": 47490.175,
       "jornada_despues_s": 36292.914000000004,
       "atractivos_restantes": 6,
       "justificacion": "mayor ahorro de tiempo total (visita + desplazamiento) según el criterio de quita registrado antes de calcular"
