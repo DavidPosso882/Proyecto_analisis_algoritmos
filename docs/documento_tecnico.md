@@ -100,6 +100,29 @@ casi empatan, lo que coincide con el costo lineal esperado del algoritmo; no se
 observan saltos que sugieran otra complejidad (GLOB-10). Fuente:
 `resultados/r1/t_componente.csv`, `resultados/r1/cifras_r1a.json`.
 
+**Qué cubre cada «radio».** Las redes de 2, 5, 10 y 20 km se descargaron con
+`ox.graph_from_point(..., dist=r, dist_type="bbox")` (parámetros en
+`data/crudo/*.meta.json`). Con `dist_type="bbox"`, OSMnx no descarga un
+círculo sino un **cuadrado de lado 2·r** centrado en la plaza de Bolívar, y no
+lo recorta al límite del departamento. La comparación de los ids de nodo con la
+red del departamento (`verificacion/r1_radios.py`) muestra qué cubre cada una:
+
+| Red | Cuadro | Nodos | Del Quindío | De otros departamentos | Nodos del Quindío cubiertos |
+|---|---|---|---|---|---|
+| Radio de 2 km | 4 × 4 km | 1 639 | 1 639 | 0 | 18,7 % |
+| Radio de 5 km | 10 × 10 km | 4 297 | 4 297 | 0 | 48,8 % |
+| Radio de 10 km | 20 × 20 km | 5 929 | 5 929 | 0 | 68,0 % |
+| Radio de 20 km | 40 × 40 km | 8 786 | 8 403 | 383 | 95,3 % |
+
+Las tres primeras redes son subconjuntos de la del departamento. La de 20 km
+tiene casi el mismo tamaño que el departamento (8 786 frente a 8 819 nodos),
+pero **no es la misma red**: Armenia está a 36,7 km del borde sur de la red del
+departamento (Génova y Pijao) y a unos 20 km de los demás bordes, así que el
+cuadro de 40 × 40 km deja fuera unos 400 nodos del sur y, a cambio, incluye 383
+nodos de los departamentos vecinos. Por eso su tiempo es casi igual al del
+departamento: el algoritmo es lineal en V + E y las dos redes tienen un tamaño
+de entrada casi igual (28 864 frente a 29 003), no porque cubran la misma zona.
+
 **Discusión.** Trabajar solo con la componente evita respuestas «sin camino» en
 R2 y R4 y reduce el grafo en 16 nodos y 21 aristas. La asociación lugar→nodo se
 hizo por vecino más cercano euclidiano en UTM 18N; los lugares a más de 500 m se
