@@ -78,31 +78,40 @@ def _licencia_qhull():
         raise ValueError(f"no se encontró {ruta}")
     lineas = [ln.strip() for ln in ruta.read_text(encoding="utf-8").splitlines()
               if ln.strip()]
-    return _ruta_relativa(ruta), " ".join(lineas[:14])
+    return _ruta_relativa(ruta).replace("\\", "/"), " ".join(lineas[:14])
 
 
 def _extension():
-    """Extensión compilada _qhull: nombre, tipo y bibliotecas enlazadas."""
-    halladas = sorted(_carpeta_spatial().glob("_qhull*.so"))
+    """Extensión compilada _qhull: nombre, tipo y bibliotecas enlazadas.
+
+    En Linux/Mac la extensión es ``.so`` y se listan sus bibliotecas con ``ldd``;
+    en Windows es ``.pyd`` y ``ldd`` no existe, así que el enlace se informa
+    como no disponible.
+    """
+    carpeta = _carpeta_spatial()
+    halladas = sorted(list(carpeta.glob("_qhull*.so")) + list(carpeta.glob("_qhull*.pyd")))
     if not halladas:
-        raise ValueError("no se encontró la extensión compilada _qhull*.so")
+        raise ValueError("no se encontró la extensión compilada _qhull (.so o .pyd)")
     ruta = halladas[0]
     enlace = "no disponible"
-    try:
-        salida = subprocess.run(["ldd", str(ruta)], capture_output=True,
-                                text=True, check=False)
-        if salida.returncode == 0:
-            # Sin direcciones de carga: la ficha debe ser reproducible.
-            lineas = [re.sub(r"\s*\(0x[0-9a-f]+\)", "", ln).strip()
-                      for ln in salida.stdout.splitlines()]
-            enlace = " ".join(ln for ln in lineas
-                              if "=>" in ln or "linux-vdso" in ln)
-    except OSError:
-        enlace = "ldd no disponible"
-    return {"archivo": _ruta_relativa(ruta), "bytes": ruta.stat().st_size,
+    if ruta.suffix == ".so":
+        try:
+            salida = subprocess.run(["ldd", str(ruta)], capture_output=True,
+                                    text=True, check=False)
+            if salida.returncode == 0:
+                # Sin direcciones de carga: la ficha debe ser reproducible.
+                lineas = [re.sub(r"\s*\(0x[0-9a-f]+\)", "", ln).strip()
+                          for ln in salida.stdout.splitlines()]
+                enlace = " ".join(ln for ln in lineas
+                                  if "=>" in ln or "linux-vdso" in ln)
+        except OSError:
+            enlace = "ldd no disponible"
+    else:
+        enlace = "no disponible en Windows (DLL de extensión .pyd; ldd no existe)"
+    return {"archivo": _ruta_relativa(ruta).replace("\\", "/"),
+            "bytes": ruta.stat().st_size,
             "tipo": "extensión compilada de CPython (no Python puro)",
             "bibliotecas_enlazadas": enlace}
-
 
 def main():
     R3.mkdir(parents=True, exist_ok=True)
