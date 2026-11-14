@@ -178,6 +178,6 @@ def metadatos(**extra):
 
 def escribir_json(path, datos):
     """Escribe JSON UTF-8 con sangría (resultados legibles, GLOB-08)."""
-    with open(path, "w", encoding="utf-8") as fh:
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(datos, fh, indent=2, ensure_ascii=False, sort_keys=False)
         fh.write("\n")
