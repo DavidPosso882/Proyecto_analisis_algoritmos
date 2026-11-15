@@ -134,13 +134,13 @@ algorithms*, SIAM J. Comput. 1(2)).
 
 | Red | V | E | V + E | Tiempo (ms) |
 |---|---|---|---|---|
-| Radio de 2 km | 1 639 | 3 639 | 5 278 | 30,527 |
-| Radio de 5 km | 4 297 | 9 710 | 14 007 | 85,866 |
-| Radio de 10 km | 5 929 | 13 376 | 19 305 | 123,022 |
-| Radio de 20 km | 8 786 | 20 078 | 28 864 | 185,765 |
-| Departamento completo | 8 819 | 20 184 | 29 003 | 186,274 |
+| Radio de 2 km | 1 639 | 3 639 | 5 278 | 37,1 |
+| Radio de 5 km | 4 297 | 9 710 | 14 007 | 100,5 |
+| Radio de 10 km | 5 929 | 13 376 | 19 305 | 134,6 |
+| Radio de 20 km | 8 786 | 20 078 | 28 864 | 201,3 |
+| Departamento completo | 8 819 | 20 184 | 29 003 | 198,8 |
 
-*Unidad:* milisegundos, mediana de 5 ejecuciones (EXP-05); `V + E` es el tamaño
+*Unidad:* milisegundos, mediana de 5 ejecuciones en la máquina B (EXP-05); `V + E` es el tamaño
 de entrada. *Lectura:* el tiempo crece con V + E y las dos redes más grandes
 casi empatan, lo que coincide con el costo lineal esperado del algoritmo; no se
 observan saltos que sugieran otra complejidad (GLOB-10). Fuente:
@@ -246,15 +246,18 @@ y tiempo en milisegundos en el vertical, con una serie por versión.
 
 | Cociente lineal / cola | Valor |
 |---|---|
-| Mediana | 149,84 |
-| Mínimo | 5,99 |
-| Máximo | 189,60 |
+| Mediana | 123,94 |
+| Mínimo | 4,59 |
+| Máximo | 157,04 |
 
-*Unidad:* el cociente es adimensional (tiempos en ms). *Lectura:* la versión
-lineal tarda ~150 veces más en mediana, coherente con O(V²) frente a O((V + E) log V) en
-una red de 8 803 nodos; el mínimo (6x, par F05→A09) corresponde a un par cercano
-con pocos nodos explorados y el máximo (190x, A01→A02) a un par largo; la diferencia también incluye el costo de las
-estructuras de cada implementación propia. Fuente:
+*Unidad:* el cociente es adimensional (tiempos en ms, máquina B). *Lectura:* la
+versión lineal tarda ~124 veces más en mediana, coherente con O(V²) frente a
+O((V + E) log V) en una red de 8 803 nodos; el mínimo (5x, par F05→A09)
+corresponde a un par cercano con pocos nodos explorados, porque la versión
+lineal se detiene casi de inmediato, y el máximo (157x, A11→C06) a un par largo;
+la diferencia también incluye el costo de las estructuras de cada implementación
+propia. En la máquina A la mediana fue 150x: el cociente depende de la máquina,
+pero no la diferencia de orden de magnitud (ver 7.1). Fuente:
 `resultados/r2/cociente.json`.
 
 **Matriz de tiempos.** `resultados/r2/matriz_tiempos.csv` es dirigida y no
@@ -296,16 +299,20 @@ biblioteca usado para extremos y particiones (Timsort de Python, O(n log n)).
 
 | Conjunto de puntos | n | Vértices | Tiempo propio (ms) | Tiempo SciPy (ms) | Cociente |
 |---|---|---|---|---|---|
-| Nodos de la red | 8 803 | 14 | 9,719 | 1,258 | 7,73 |
-| Cuadrado, 1 000 puntos | 1 000 | 17 | 1,975 | 0,430 | 4,59 |
-| Cuadrado, 10 000 puntos | 10 000 | 22 | 13,760 | 1,466 | 9,39 |
-| Cuadrado, 50 000 puntos | 50 000 | 34 | 73,127 | 6,622 | 11,04 |
+| Nodos de la red | 8 803 | 14 | 11,720 | 2,954 | 3,97 |
+| Cuadrado, 1 000 puntos | 1 000 | 17 | 1,584 | 1,871 | 0,85 |
+| Cuadrado, 10 000 puntos | 10 000 | 22 | 16,554 | 2,864 | 5,78 |
+| Cuadrado, 50 000 puntos | 50 000 | 34 | 90,188 | 7,600 | 11,87 |
 
-*Unidad:* milisegundos; `n` es tras deduplicar. *Lectura:* el tiempo propio
-crece de forma aproximadamente lineal-logarítmica y el cociente frente a SciPy
-se mantiene entre 4,6 y 11,0, con tendencia a crecer con n porque la referencia
-está compilada (Qhull en C) mientras la implementación propia es Python puro;
-los vértices coinciden con SciPy en las cuatro filas. Fuente:
+*Unidad:* milisegundos, máquina B; `n` es tras deduplicar. *Lectura:* el tiempo
+propio crece de forma aproximadamente lineal-logarítmica (de 1,6 ms a 90 ms al
+pasar de 1 000 a 50 000 puntos). El cociente frente a SciPy crece con n, de 0,85
+a 11,87, porque la referencia está compilada (Qhull en C) y la implementación
+propia es Python puro. Con 1 000 puntos la versión propia es incluso más rápida:
+SciPy tiene un costo fijo por llamada (convertir la entrada a `double` y preparar
+Qhull) que con pocos puntos pesa más que el algoritmo. Ese costo fue mayor en la
+máquina B, donde el cociente con 1 000 puntos es 0,85 frente a 4,59 en la
+máquina A (ver 7.1). Los vértices coinciden con SciPy en las cuatro filas. Fuente:
 `resultados/r3/mediciones.csv`, `resultados/r3/scipy_info_r3.md`.
 
 **Uso en R5.** Los 14 vértices se guardan en
@@ -343,21 +350,24 @@ bytes (R4-05).
 
 | k | Fuerza bruta (ms) | Held-Karp (ms) |
 |---|---|---|
-| 5 | 0,189 | 0,095 |
-| 6 | 0,951 | 0,205 |
-| 7 | 7,058 | 0,464 |
-| 8 | 60,983 | 1,043 |
-| 9 | 588,557 | 2,456 |
-| 10 | 6 451,338 | 5,953 |
-| 11 | 73 175,226 | 14,344 |
-| 12 | no completada | 33,794 |
+| 5 | 0,223 | 0,105 |
+| 6 | 1,112 | 0,217 |
+| 7 | 10,799 | 0,492 |
+| 8 | 85,378 | 1,222 |
+| 9 | 713,983 | 3,101 |
+| 10 | 7 392,237 | 6,707 |
+| 11 | 87 960,144 | 16,308 |
+| 12 | no completada | 40,209 |
 
-*Unidad:* milisegundos, mediana de 5 ejecuciones. *Lectura:* la fuerza bruta
-se multiplica por 4 a 12 en cada paso de k (crecimiento factorial) y se corta en
-k = 12 por límite de tiempo, mientras Held-Karp crece como k²·2^k; el mayor k
-resuelto por ambos métodos es 11 y, en k = 5 a 11, los dos devuelven el mismo
-costo óptimo (`resultados/r4/curva_exactos.csv`, verificación R4-06), lo que
-coincide con las complejidades declaradas. Fuente:
+*Unidad:* milisegundos, máquina B; mediana de 5 ejecuciones, salvo fuerza bruta
+con k = 11, que pasó de 60 s y se midió una sola vez (EXP-04). *Lectura:* la
+fuerza bruta se multiplica por 5 a 12 en cada paso de k (crecimiento factorial;
+de k = 10 a 11 el factor es 11,9, cerca del 11 que predice O(k!)) y se corta en
+k = 12 por el límite de 5 minutos, mientras Held-Karp se multiplica por cerca de
+2,5 en cada paso, como predice O(k²·2^k). El mayor k resuelto por ambos métodos
+es 11 y, en k = 5 a 11, los dos devuelven el mismo costo óptimo
+(`resultados/r4/curva_exactos.csv`, verificación R4-06), lo que coincide con las
+complejidades declaradas. Fuente:
 `resultados/r4/tabla_exactos.csv`, `resultados/r4/curva_exactos.csv`.
 
 ### 5.2 Heurística voraz y su calidad
@@ -369,14 +379,16 @@ lugar no visitado de menor tiempo y al final se regresa; desempate por menor
 
 | k | Instancias | Brecha promedio (%) | Brecha máxima (%) | Brecha mínima (%) |
 |---|---|---|---|---|
-| 5 | 5 | 3,3158 | 5,0487 | 2,2453 |
-| 8 | 5 | 4,8725 | 11,3227 | 0,0090 |
-| 10 | 5 | 10,0750 | 16,7878 | 3,1285 |
-| 12 | 5 | 11,7232 | 22,0549 | 5,7446 |
+| 5 | 5 | 3,5102 | 5,5115 | 2,0886 |
+| 8 | 5 | 4,8695 | 11,3227 | 0,0090 |
+| 10 | 5 | 9,9392 | 16,7878 | 3,1285 |
+| 12 | 5 | 11,9282 | 21,8829 | 5,6913 |
 
 *Unidad:* brecha en porcentaje, (heurística − Held-Karp) / Held-Karp × 100.
 *Lectura:* la brecha es no negativa porque Held-Karp es óptimo y crece con k como
-se espera de una heurística constructiva. Fuente:
+se espera de una heurística constructiva. Las brechas no dependen de la máquina,
+porque son razones de costos; las diferencias con la primera versión del
+documento se deben solo al catálogo corregido (A13, F01 y F03). Fuente:
 `resultados/r4/tabla_calidad.csv`, `resultados/r4/calidad_brechas.csv`.
 
 **Por qué el voraz falla aquí y no en Dijkstra.** En Dijkstra la elección voraz
@@ -395,10 +407,16 @@ supere 11 h, con el criterio escrito antes de calcular (DA-22). Resultado final:
 jornada (`resultados/r4/tabla_itinerario.csv`).
 
 *Unidad:* desplazamientos y visitas en minutos, acumulado y jornada en horas.
-*Lectura:* el itinerario cabe en la jornada de 11 h tras quitar dos atractivos
-(A12 y A13), que son los que más tiempo total ahorran.
+*Lectura:* el itinerario cabe en la jornada de 11 h tras quitar dos atractivos,
+primero A13 (ahorro de 190,6 min) y luego A12 (ahorro de 186,6 min), que son los
+que más tiempo total ahorran.
 
 **Firma humana R4-27.** David Posso, 2026-11-04: se confirman la selección inicial de 8 atractivos (A07, A04, A12, A13, A14, A10, A05, A08) y las quitas A12 y A13 por mayor ahorro de tiempo total según criterio DA-22 registrado en `resultados/r4/itinerario_criterio_previo.json`. Jornada final 10,081 h, cabe en 11 h.
+**Nota (2026-11-15).** Al regenerar R4 con el catálogo corregido, cambió solo el
+orden de las quitas: A13 se quita primero porque su nueva ubicación lo deja más
+lejos del resto del recorrido. El conjunto quitado (A12 y A13), los 6 atractivos
+finales, el recorrido y la jornada de 10,081 h son idénticos a los firmados, así
+que la firma sigue siendo válida.
 
 ## 6. Requerimiento 5 — Aplicación
 
@@ -429,7 +447,7 @@ negativa (R5-04).
 **Riesgos.** R5-09: las teselas del mapa requieren red al usar la aplicación, lo
 que está documentado en el README; sin conexión, el tiempo de viaje, los
 vértices y las tablas siguen disponibles. R5-10: la carga de datos se midió antes
-de decidir que fuera única (0,72 s al arrancar; consultas de ruta de 7 a 18 ms) y
+de decidir que fuera única (0,72 s al arrancar y consultas de ruta de 7 a 18 ms, medidos en la máquina A) y
 no se añadió ninguna otra caché (GLOB-11).
 
 ## 7. Conclusiones
@@ -439,14 +457,19 @@ no se añadió ninguna otra caché (GLOB-11).
 2. La componente fuertemente conexa se obtiene en tiempo lineal en V + E y basta
    para que todo par de lugares tenga camino dirigido.
 3. La cola de prioridad es decisiva en R2: la mediana del cociente frente a la
-   versión lineal es 149,84 en la red completa (rango 5,99–189,60 según par).
+   versión lineal es 123,94 en la red completa (rango 4,59–157,04 según par) en
+   la máquina B, y 149,84 en la máquina A.
 4. QuickHull con enteros exactos reproduce los vértices de SciPy y mantiene la
    envolvente de la red en 14 vértices.
-5. Held-Karp resuelve hasta k = 12 (fuerza bruta hasta k = 11), y la heurística
-   voraz queda entre 0,009 % y 22,05 % por encima del óptimo según k (promedio 3,3 %–11,7 %).
+5. Held-Karp resuelve hasta k = 12 (fuerza bruta hasta k = 11) en las dos
+   máquinas, y la heurística voraz queda entre 0,009 % y 21,88 % por encima del
+   óptimo según k (promedio 3,5 %–11,9 %).
 6. La aplicación demuestra los resultados sin descargar ni re-medir: recalcula
    solo lo que el enunciado pide al momento y sus cifras coinciden con los
    archivos de resultados.
+7. Los tiempos absolutos cambian entre máquinas (la B fue entre 6 % y 22 % más
+   lenta según el requerimiento), pero los resultados lógicos y la forma de
+   crecimiento de cada algoritmo se mantienen (sección 7.1).
 
 ### 7.1 Comparación entre las dos máquinas
 
