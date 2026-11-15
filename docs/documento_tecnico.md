@@ -468,10 +468,10 @@ sin importar los valores de la matriz.
 **Razón Windows/Linux por requerimiento** (mediana en B ÷ mediana en A; mayor
 que 1 significa que B fue más lenta):
 
-| Requerimiento | Mediciones comparadas | Razón mediana | Rango |
-|---|---|---|---|
+| Requerimiento | Mediciones comparadas | Razón mediana | Rango       |
+|---|---|---|-------------|
 | R1 (componente) | 5 | 1,09 | 1,07 – 1,22 |
-| R2 (Dijkstra y matriz) | 66 | 1,18 | 0,98 – 1,41 |
+| R2 (Dijkstra y matriz) | 66 | 1,18 | 0,98 – 1,42 |
 | R3 (envolvente) | 8 | 1,22 | 0,80 – 4,36 |
 | R4 (exactos y voraz) | 55 | 1,06 | 0,97 – 1,53 |
 
