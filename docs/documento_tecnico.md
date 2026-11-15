@@ -572,4 +572,8 @@ aceptó, rechazó o modificó y cómo se verificó) se mantiene en
 [`docs/uso_ia.md`](uso_ia.md), conforme a REPO-07 y GLOB-25. Este anexo lo
 redactan y firman personas; el agente no certifica el uso de IA.
 
-Pendientes humanos restantes: ejecución del README en un entorno limpio (R5-13). Firmado R4-27 (David Posso, 2026-11-04), revisión y firma del documento (REPO-11) y registro del uso de IA de las tareas de cierre.
+El registro de Juan Diego García (correcciones, mediciones en la máquina B y
+actualización del documento) está completo. Pendientes: registro de David Posso
+en `docs/uso_ia.md`, ejecución del README en un entorno limpio (R5-13) y nueva
+revisión y firma del documento por el grupo, porque cambió después de la firma
+del 2026-11-04 (REPO-11).
