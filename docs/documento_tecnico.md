@@ -54,6 +54,52 @@ preparar datos, graficar o verificar de forma independiente (GLOB-02, GLOB-03).
    vértices de R3; calcula rutas e itinerarios al momento con los módulos de R2
    y R4 y muestra las tablas y gráficas guardadas en `resultados/`.
 
+### 1.3 Protocolo experimental y máquinas de medición
+
+Todas las mediciones pasan por el arnés propio (`src/quindio/medicion/arnes.py`),
+que aplica el protocolo de la sección 6 del enunciado:
+
+- Cada medición corre en un **proceso hijo** (`multiprocessing`, contexto
+  `spawn`) que recibe la entrada ya preparada; solo se mide el algoritmo, con
+  `time.perf_counter_ns` y el recolector de basura desactivado dentro de la
+  región medida. Leer archivos, generar datos e imprimir quedan por fuera.
+- **5 repeticiones y se reporta la mediana**. Si la primera repetición pasa de
+  60 s, se mide una sola vez. Si una ejecución pasa de **5 minutos**, se detiene
+  el proceso hijo y se registra como `no_completada`, sin tiempo.
+- Tiempos guardados en **milisegundos**. Datos aleatorios con **semilla fija**:
+  maestra 42 y derivadas `42 + índice`, documentadas en cada archivo de resultados.
+- Antes de medir, cada algoritmo se **verifica** (contra otra implementación
+  propia, un caso resuelto a mano o una biblioteca); si la verificación falla,
+  no se mide.
+- Cada fila de resultados guarda la **huella de la máquina**, los 5 tiempos
+  crudos, la semilla y la huella de la entrada. Al fusionar resultados, el arnés
+  rechaza filas de máquinas distintas.
+
+**Máquinas.** El proyecto se midió completo en dos máquinas:
+
+| | Máquina A (Linux) | Máquina B (Windows) |
+|---|---|---|
+| Procesador | AMD Ryzen 7 5800H (8 núcleos / 16 hilos, 3,2 GHz base) | Intel Core i5-1135G7 de 11.ª generación (4 núcleos / 8 hilos, 2,4 GHz base) |
+| Memoria RAM | 16 GB DDR4-3200 (15 372 MB disponibles para el sistema) | 16 GB (16 149 MB disponibles para el sistema) |
+| Sistema operativo | Fedora Linux 44, kernel 7.2.11-200.fc44.x86_64 | Windows 11 Home Single Language, compilación 26200 |
+| Python | 3.14.8 | 3.14.0 |
+| Bibliotecas | SciPy 1.18.1, NumPy 2.5.4, NetworkX 3.7, OSMnx 2.1.1 | las mismas versiones |
+| Fechas de medición | 2026-10-27 a 2026-11-04 | 2026-11-14 |
+| Resultados | `resultados/linux/` | `resultados/r1` a `resultados/r4` (vigentes) |
+
+Se cumple la regla de que las mediciones de un mismo requerimiento se hacen en
+la misma máquina: **cada requerimiento se midió completo en cada una**, y nunca
+se mezclan filas de las dos en una misma tabla o gráfica. Los resultados
+vigentes del documento son los de la máquina B, que además usan el catálogo con
+las coordenadas corregidas de A13, F01 y F03. Los de la máquina A se conservan
+sin cambios como referencia para la comparación de la sección 7.1.
+
+Las dos máquinas difieren a la vez en **procesador y sistema operativo**, así
+que la comparación de la sección 7.1 no aísla el efecto del sistema operativo:
+muestra cuánto cambian los tiempos absolutos entre dos equipos reales y si se
+mantienen las conclusiones del análisis (crecimiento con el tamaño de la
+entrada, cocientes entre versiones y mayor k resuelto).
+
 ## 2. Requerimiento 1 — Modelo de la red vial
 
 **Problema.** Representar la red vial del Quindío con pesos utilizables por los
