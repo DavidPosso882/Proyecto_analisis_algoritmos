@@ -1,7 +1,7 @@
 # Prueba en Windows (2026-11-14)
 
-- Máquina: Windows 11, Intel64 Family 6 Model 140 (11.ª gen.), 16 GB de RAM, Python 3.14.0.
-- Responsable: Diego García.
+- Máquina: Windows 11 Home Single Language (compilación 26200), Intel Core i5-1135G7 (4 núcleos / 8 hilos), 16 GB de RAM, Python 3.14.0.
+- Responsable: Juan Diego García.
 - Rama: `correcciones-Diego`.
 
 ## Automática
