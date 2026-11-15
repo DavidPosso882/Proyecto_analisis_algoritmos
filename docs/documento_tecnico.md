@@ -448,6 +448,100 @@ no se añadió ninguna otra caché (GLOB-11).
    solo lo que el enunciado pide al momento y sus cifras coinciden con los
    archivos de resultados.
 
+### 7.1 Comparación entre las dos máquinas
+
+Todos los experimentos se midieron completos en la máquina A (Linux, AMD Ryzen 7
+5800H) y en la máquina B (Windows 11, Intel Core i5-1135G7); ver la sección 1.3.
+La comparación se genera desde los archivos con
+`experimentos/comparar_maquinas.py` (`resultados/comparacion/`). Como las
+máquinas difieren en procesador **y** sistema operativo, la comparación no
+separa el efecto de cada uno; sirve para ver qué tanto cambian los tiempos
+absolutos entre dos equipos reales y si las conclusiones del análisis se
+mantienen.
+
+Se compararon solo las mediciones con el mismo trabajo en ambas máquinas. En R2
+se excluyen las 4 cuya entrada cambió con el catálogo corregido (T02 → F03 y las
+filas de matriz de A13, F01 y F03). En R4 se conservan todas, porque fuerza
+bruta, Held-Karp y el voraz hacen el mismo número de operaciones para un k dado,
+sin importar los valores de la matriz.
+
+**Razón Windows/Linux por requerimiento** (mediana en B ÷ mediana en A; mayor
+que 1 significa que B fue más lenta):
+
+| Requerimiento | Mediciones comparadas | Razón mediana | Rango |
+|---|---|---|---|
+| R1 (componente) | 5 | 1,09 | 1,07 – 1,22 |
+| R2 (Dijkstra y matriz) | 66 | 1,18 | 0,98 – 1,41 |
+| R3 (envolvente) | 8 | 1,22 | 0,80 – 4,36 |
+| R4 (exactos y voraz) | 55 | 1,06 | 0,97 – 1,53 |
+
+**Mediciones representativas** (ms, mediana de 5):
+
+| Medición | A (Linux) | B (Windows) | Razón |
+|---|---|---|---|
+| R1 · componente del departamento | 186,27 | 198,80 | 1,07 |
+| R2 · C04 → C12, cola de prioridad | 6,40 | 7,80 | 1,22 |
+| R2 · C04 → C12, versión lineal | 959,67 | 969,50 | 1,01 |
+| R3 · red, versión propia | 9,72 | 11,72 | 1,21 |
+| R3 · red, SciPy | 1,26 | 2,95 | 2,35 |
+| R3 · cuadrado de 1 000 puntos, propia | 1,97 | 1,58 | 0,80 |
+| R3 · cuadrado de 1 000 puntos, SciPy | 0,43 | 1,87 | 4,36 |
+| R3 · cuadrado de 50 000 puntos, propia | 73,13 | 90,19 | 1,23 |
+| R3 · cuadrado de 50 000 puntos, SciPy | 6,62 | 7,60 | 1,15 |
+| R4 · fuerza bruta, k = 11 | 73 175 | 87 960 | 1,20 |
+| R4 · Held-Karp, k = 12 | 33,79 | 40,21 | 1,19 |
+
+**Lo que se mantiene igual en las dos máquinas.**
+
+- Los resultados lógicos: V y E de las cinco redes de R1, los vértices de la
+  envolvente en los cuatro conjuntos de R3 (14, 17, 22 y 34), los pares
+  sorteados de R2, las instancias de R4 y el mayor k resuelto en el tope de
+  5 minutos (11 con fuerza bruta y 12 con Held-Karp).
+- El crecimiento con el tamaño de la entrada. Al pasar de k = 10 a k = 11, la
+  fuerza bruta se multiplica por 11,3 en A y por 11,9 en B, cerca del factor 11
+  que predice O(k!). Al pasar de k = 11 a k = 12, Held-Karp se multiplica por
+  2,36 en A y por 2,47 en B, cerca del factor (12/11)²·2 ≈ 2,38 que predice
+  O(k²·2^k). Cambiar de máquina cambia la constante, no la forma de la curva.
+- El orden entre algoritmos: en ambas máquinas Dijkstra con cola es dos órdenes
+  de magnitud más rápido que la versión lineal, y Held-Karp es miles de veces
+  más rápido que la fuerza bruta desde k = 10.
+
+**Lo que cambia, y por qué importa para el análisis.**
+
+- **La máquina B es más lenta en general** (entre 6 % y 22 % según la mediana de
+  cada requerimiento), lo esperable para un procesador de 4 núcleos frente a uno
+  de 8. Cada medición usa un solo núcleo, así que pesan más la frecuencia, la
+  caché y el sistema operativo que el número de núcleos.
+- **La diferencia no es uniforme entre algoritmos.** La versión lineal de
+  Dijkstra tarda casi lo mismo en ambas máquinas (razón 1,01), mientras que la
+  versión con cola tarda 21 % más en B. Por eso el cociente lineal/cola baja de
+  una mediana de 150× en A a 124× en B. Una explicación posible es que la
+  versión con cola crea y descarta muchas tuplas en el montículo, y la gestión
+  de memoria cuesta distinto en cada sistema. La conclusión práctica es que el
+  cociente entre dos algoritmos **no es una constante del algoritmo**: depende
+  de la máquina. La comparación asintótica (O(V²) frente a O((V + E) log V)) sí
+  se mantiene.
+- **SciPy tiene un costo fijo mayor en B.** En B, SciPy tarda entre 1,0 y 1,7 ms
+  más que en A en todos los conjuntos, casi sin importar n. Ese costo fijo (la
+  conversión a `double` y la preparación de Qhull) domina con pocos puntos: con
+  1 000 puntos, la versión propia en Python **le gana a SciPy en B** (cociente
+  0,85 frente a 4,59 en A). Con 50 000 puntos, el costo fijo se diluye y los
+  cocientes vuelven a ser parecidos (11,9 en B y 11,0 en A). Es un ejemplo de
+  por qué el análisis asintótico describe el comportamiento para n grande y no
+  necesariamente para n pequeño, donde dominan las constantes.
+
+**Portabilidad.** Medir en una segunda plataforma reveló cuatro supuestos de
+Linux en el código, que se corrigieron sin cambiar ningún algoritmo:
+
+1. El arnés obtenía la RAM con `os.sysconf`, que no existe en Windows.
+2. La ficha de SciPy buscaba la extensión compilada como `.so` y usaba `ldd`; en
+   Windows la extensión es `.pyd` y `ldd` no existe.
+3. Python escribe los archivos de texto con saltos `\r\n` en Windows, así que
+   cada JSON generado aparecía modificado por completo. Se resolvió con
+   `.gitattributes` y escribiendo los JSON de R4 con `newline="\n"`, para que la
+   huella del prerregistro del itinerario sea la misma en ambas plataformas.
+4. El README solo traía comandos de Linux.
+
 ## 8. Anexo de uso de inteligencia artificial
 
 El registro por tarea (herramienta y modelo, fecha, ID del plan, pedido, qué se

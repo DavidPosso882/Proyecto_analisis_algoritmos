@@ -180,6 +180,12 @@ repeticiones, mediana, semilla efectiva y huella de entrada.
 .venv/bin/python experimentos/r4/itinerario.py
 .venv/bin/python experimentos/r4/tablas_r4b.py
 ```
+Comparación entre máquinas (lee `resultados/linux/` y `resultados/r1`–`r4`; no
+vuelve a medir):
+
+```bash
+.venv/bin/python experimentos/comparar_maquinas.py
+```
 
 Verificación independiente (scripts aparte; pueden usar NetworkX, SciPy o
 Shapely, nunca los módulos medidos ni la aplicación):
@@ -204,6 +210,8 @@ Shapely, nunca los módulos medidos ni la aplicación):
 | `resultados/r2/` | mediciones de Dijkstra, cociente entre versiones, pares, vecindad, gráfica y matriz de tiempos 40×40 |
 | `resultados/r3/` | tabla del Anexo, mediciones e información de SciPy, y vértices de la envolvente (`vertices_red.csv`) |
 | `resultados/r4/` | instancias, curva de exactos, calidad de la heurística, itinerario y sus tablas |
+| `resultados/linux/` | mediciones originales de la máquina A (Linux), sin cambios, para la comparación |
+| `resultados/comparacion/` | razón Windows/Linux por medición y resumen por requerimiento |
 | `experimentos/` | scripts que generan `resultados/` (R1 a R4 y la demo del arnés) |
 | `verificacion/` | comprobaciones independientes con bibliotecas |
 
