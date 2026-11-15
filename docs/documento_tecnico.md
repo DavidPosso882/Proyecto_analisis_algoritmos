@@ -391,12 +391,53 @@ porque son razones de costos; las diferencias con la primera versión del
 documento se deben solo al catálogo corregido (A13, F01 y F03). Fuente:
 `resultados/r4/tabla_calidad.csv`, `resultados/r4/calidad_brechas.csv`.
 
-**Por qué el voraz falla aquí y no en Dijkstra.** En Dijkstra la elección voraz
-es segura porque, con pesos no negativos, la distancia mínima ya fijada no puede
-mejorarse después (subestructura óptima del camino mínimo). En el TSP la mejor
-arista inmediata puede dejar el tour atrapado en una secuencia cara: la solución
-se arma con una decisión local que no considera el resto del ciclo, como muestran
-las brechas de la tabla.
+**Ejemplo: por qué el voraz no encuentra el óptimo (R4.5).** Instancia real de
+la serie de calidad con k = 5 (instancia 2), partiendo de Armenia (C01): Parque
+Nacional del Café (A01), Circasia (C04), Finca Don Elías en Salento (F05),
+PANACA en Quimbaya (A02) y Génova (C07). No incluye lugares del catálogo
+corregido, así que es idéntica en las dos máquinas. Tiempos en minutos
+(`experimentos/r4/ejemplo_voraz.py`):
+
+| Desde \ hasta | C01 | A01 | C04 | F05 | A02 | C07 |
+|---|---|---|---|---|---|---|
+| C01 | 0,0 | 16,0 | 19,8 | 31,3 | 43,4 | 96,7 |
+| A01 | 16,2 | 0,0 | 35,1 | 46,8 | 50,0 | 104,3 |
+| C04 | 19,2 | 33,1 | 0,0 | 16,5 | 52,5 | 113,9 |
+| F05 | 30,6 | 44,5 | 17,6 | 0,0 | 70,0 | 125,3 |
+| A02 | 42,9 | 49,9 | 52,5 | 69,1 | 0,0 | 134,3 |
+| C07 | 96,6 | 104,4 | 115,3 | 125,9 | 134,4 | 0,0 |
+
+| Paso | Voraz | Held-Karp (óptimo) |
+|---|---|---|
+| 1 | C01 → A01: 16,0 | C01 → C07: 96,7 |
+| 2 | A01 → C04: 35,1 | C07 → A01: 104,4 |
+| 3 | C04 → F05: 16,5 | A01 → A02: 50,0 |
+| 4 | F05 → A02: 70,0 | A02 → C04: 52,5 |
+| 5 | A02 → C07: **134,3** | C04 → F05: 16,5 |
+| 6 | C07 → C01: 96,6 | F05 → C01: 30,6 |
+| **Total** | **368,4 min** | **350,7 min** |
+
+El voraz elige siempre el lugar más cercano, y en los cuatro primeros pasos su
+elección es la mejor posible en ese momento. Pero Génova está lejos de todos los
+demás lugares, así que el voraz la deja para el final y tiene que llegar a ella
+desde PANACA, que es el lugar del que más lejos queda: 134,3 min, el tramo más
+caro de toda la instancia. Held-Karp hace lo contrario: paga Génova al principio
+(96,7 min, una elección que el voraz nunca haría porque es la más lejana desde
+Armenia) y organiza el resto para terminar en Salento, a 30,6 min de Armenia. El
+voraz termina 17,7 min (5,05 %) por encima del óptimo.
+
+**Por qué la elección voraz sirve en Dijkstra y no aquí.** En Dijkstra, extraer
+el nodo con menor distancia tentativa es una decisión definitiva y segura: todo
+camino alternativo hacia ese nodo tendría que pasar por un nodo no extraído, cuya
+distancia ya es mayor o igual, y con pesos no negativos no puede mejorar. Además,
+fijar un nodo no le quita opciones al resto del cálculo, porque los demás caminos
+se siguen pudiendo relajar. En el TSP, en cambio, cada elección **consume** un
+lugar y decide desde dónde se continúa: el costo de una elección depende de lo
+que quede por visitar y de dónde termine el recorrido, que el voraz no mira. En
+el ejemplo, ir primero a A01 es la mejor elección local, pero condena a llegar a
+Génova desde el punto más lejano. El problema tiene subestructura óptima (que
+Held-Karp aprovecha considerando todos los subconjuntos), pero no tiene la
+propiedad de elección voraz que sí tiene el camino mínimo.
 
 ### 5.3 Itinerario de un día
 

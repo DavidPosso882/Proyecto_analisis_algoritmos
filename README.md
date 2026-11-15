@@ -179,6 +179,7 @@ repeticiones, mediana, semilla efectiva y huella de entrada.
 .venv/bin/python experimentos/r4/medir_calidad.py
 .venv/bin/python experimentos/r4/itinerario.py
 .venv/bin/python experimentos/r4/tablas_r4b.py
+.venv/bin/python experimentos/r4/ejemplo_voraz.py 
 ```
 Comparación entre máquinas (lee `resultados/linux/` y `resultados/r1`–`r4`; no
 vuelve a medir):
