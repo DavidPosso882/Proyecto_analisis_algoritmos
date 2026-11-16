@@ -1,0 +1,102 @@
+{
+  "departamento": {
+    "V": 8819,
+    "E_multi": 20184,
+    "E_simple": 20045,
+    "mb_multi": {
+      "matriz_mb": 593.3743362426758,
+      "listas_mb": 0.5292587280273438
+    },
+    "mb_simple": {
+      "matriz_mb": 593.3743362426758,
+      "listas_mb": 0.5260772705078125
+    },
+    "Vc": 8803,
+    "Ec_multi": 20163,
+    "Ec_simple": 20024,
+    "mb_comp_multi": {
+      "matriz_mb": 591.2232131958008,
+      "listas_mb": 0.528656005859375
+    }
+  },
+  "radio_2km": {
+    "V": 1639,
+    "E_multi": 3639,
+    "E_simple": 3630,
+    "mb_multi": {
+      "matriz_mb": 20.49500274658203,
+      "listas_mb": 0.095794677734375
+    },
+    "mb_simple": {
+      "matriz_mb": 20.49500274658203,
+      "listas_mb": 0.09558868408203125
+    },
+    "Vc": 1600,
+    "Ec_multi": 3570,
+    "Ec_simple": 3561,
+    "mb_comp_multi": {
+      "matriz_mb": 19.53125,
+      "listas_mb": 0.0939178466796875
+    }
+  },
+  "radio_5km": {
+    "V": 4297,
+    "E_multi": 9710,
+    "E_simple": 9658,
+    "mb_multi": {
+      "matriz_mb": 140.87073516845703,
+      "listas_mb": 0.25502777099609375
+    },
+    "mb_simple": {
+      "matriz_mb": 140.87073516845703,
+      "listas_mb": 0.25383758544921875
+    },
+    "Vc": 4261,
+    "Ec_multi": 9656,
+    "Ec_simple": 9604,
+    "mb_comp_multi": {
+      "matriz_mb": 138.52021026611328,
+      "listas_mb": 0.25351715087890625
+    }
+  },
+  "radio_10km": {
+    "V": 5929,
+    "E_multi": 13376,
+    "E_simple": 13285,
+    "mb_multi": {
+      "matriz_mb": 268.19641876220703,
+      "listas_mb": 0.35138702392578125
+    },
+    "mb_simple": {
+      "matriz_mb": 268.19641876220703,
+      "listas_mb": 0.34930419921875
+    },
+    "Vc": 5900,
+    "Ec_multi": 13333,
+    "Ec_simple": 13242,
+    "mb_comp_multi": {
+      "matriz_mb": 265.5792236328125,
+      "listas_mb": 0.35018157958984375
+    }
+  },
+  "radio_20km": {
+    "V": 8786,
+    "E_multi": 20078,
+    "E_simple": 19946,
+    "mb_multi": {
+      "matriz_mb": 588.9419250488281,
+      "listas_mb": 0.526580810546875
+    },
+    "mb_simple": {
+      "matriz_mb": 588.9419250488281,
+      "listas_mb": 0.5235595703125
+    },
+    "Vc": 8764,
+    "Ec_multi": 20047,
+    "Ec_simple": 19916,
+    "mb_comp_multi": {
+      "matriz_mb": 585.9962158203125,
+      "listas_mb": 0.5257034301757812
+    }
+  }
+}

@@ -1,0 +1,9 @@
+k,nodos,Tiempo fuerza bruta (ms),Tiempo Held-Karp (ms),estado_fuerza_bruta,estado_held_karp,entradas_tabla_hk,memoria_estimada_hk_mb
+5,6,0.189,0.095,ok,ok,160,0.001
+6,7,0.951,0.205,ok,ok,384,0.003
+7,8,7.058,0.464,ok,ok,896,0.007
+8,9,60.983,1.043,ok,ok,2048,0.016
+9,10,588.557,2.456,ok,ok,4608,0.035
+10,11,6451.338,5.953,ok,ok,10240,0.078
+11,12,73175.226,14.344,ok,ok,22528,0.172
+12,13,,33.794,no_completada,ok,49152,0.375

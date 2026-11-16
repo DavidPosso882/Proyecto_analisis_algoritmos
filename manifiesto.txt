@@ -1,0 +1,29 @@
+# Manifiesto único de dependencias (REPO-08)
+# Una línea por paquete==versión exacta y el requerimiento que lo usa.
+# Verificado en dos máquinas:
+#   Linux (Fedora, Python 3.14.8) - 2026-10-27
+#   Windows 11 (Python 3.14.0)    - 2026-11-14
+# Instalación:
+#   pip install -r requirements.txt       (solo la aplicación)
+#   pip install -r requirements-dev.txt   (entorno completo: experimentos, pruebas y verificación)
+
+# --- Dependencias directas ---
+Flask==3.1.2        # R5: aplicación local (DA-24)
+pytest==9.1.1       # pruebas (DA-25)
+ruff==0.17.3        # análisis estático (DA-23)
+osmnx==2.1.1        # R1: descarga única de la red y pesos (DA-07)
+networkx==3.7       # R1: componente (usada por OSMnx); verificación independiente en verificacion/
+numpy==2.5.4        # R3: coordenadas enteras int64; gráficas
+scipy==1.18.1       # R3: referencia ConvexHull; verificación de asociaciones (KDTree)
+shapely==2.2.0      # verificación de contención de la envolvente (R3-13)
+matplotlib==3.11.2  # gráficas de R2 y R4
+geopandas==1.2.0    # R1: preparación de datos (requerida por OSMnx)
+pyproj==3.8.0       # R1: proyección UTM 18N, EPSG:32618 (DA-10)
+
+# --- Transitivas (no se importan directamente; versiones de referencia en Linux) ---
+# Flask:      blinker==1.9.0 click==8.5.0 itsdangerous==2.2.0 jinja2==3.1.6 markupsafe==3.0.4 werkzeug==3.1.9
+# pytest:     iniconfig==2.3.1 packaging==26.3 pluggy==1.7.0 pygments==2.21.0
+# OSMnx:      pandas==3.1.0 pyogrio==0.13.0 requests==2.34.2
+# matplotlib: contourpy==1.4.0 cycler==0.12.1 fonttools==4.68.0 kiwisolver==1.5.1 pillow==13.0.0 pyparsing==3.3.3
+# Diferencias en Windows: click==8.5.1, pandas==3.1.1 y colorama==0.4.6 (solo Windows).
+# Lista completa de Windows: docs/entorno/pip_freeze_windows.txt

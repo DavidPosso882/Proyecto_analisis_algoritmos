@@ -1,0 +1,12 @@
+Orden,Lugar,Desplazamiento desde el anterior (min),Visita (min),Tiempo acumulado (h)
+1,A14 Centro Experimental para el Estudio del Bambú y la Guadua,41.24,90.00,2.187
+2,A04 Jardín Botánico del Quindío,40.92,150.00,5.369
+3,A10 Mirador Colina Iluminada,52.45,45.00,6.993
+4,A05 Museo del Oro Quimbaya,44.10,75.00,8.978
+5,A07 Parque de los Fundadores,2.61,30.00,9.522
+6,A08 Parque Sucre,1.50,30.00,10.047
+Regreso,C01 Plaza de Bolívar - Armenia,2.06,—,10.081
+Totales,Tiempo total de visitas,,420.00,
+Totales,Tiempo total de desplazamientos,184.88,,
+Totales,Duración total de la jornada,,,10.081
+Totales,Cabe en la jornada de 11 h,,,sí

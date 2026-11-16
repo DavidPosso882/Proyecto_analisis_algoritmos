@@ -1,0 +1,28 @@
+{
+  "aristas": 20184,
+  "fecha_descarga": "2026-10-27T18:33:10.196966+00:00",
+  "networkx": "3.7",
+  "nodos": 8819,
+  "origen": "descarga",
+  "osmnx": "2.1.1",
+  "parametros": {
+    "centro_armenia_latlon": [
+      4.53247,
+      -75.67298
+    ],
+    "dist_type": "bbox",
+    "lugar_departamento": "Quind\u00edo, Colombia",
+    "network_type": "drive",
+    "osmnx": "2.1.1",
+    "radios_m": [
+      2000,
+      5000,
+      10000,
+      20000
+    ],
+    "retain_all": false,
+    "simplify": true,
+    "truncate_by_edge": false
+  },
+  "python": "3.14.8"
+}

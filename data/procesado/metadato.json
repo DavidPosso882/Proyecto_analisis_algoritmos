@@ -1,0 +1,14 @@
+{
+  "componente": {
+    "aristas": 20163,
+    "nodos": 8803
+  },
+  "fecha": "2026-11-14T22:01:52.941726+00:00",
+  "origen": "descarga",
+  "osmnx": "2.1.1",
+  "python": "3.14.0",
+  "red_antes": {
+    "aristas": 20184,
+    "nodos": 8819
+  }
+}

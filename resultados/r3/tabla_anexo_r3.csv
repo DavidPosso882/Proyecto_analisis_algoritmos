@@ -1,5 +1,5 @@
 Conjunto de puntos,n,Vértices de la envolvente,Tiempo propio (ms),Tiempo SciPy (ms),Cociente,generados
-Nodos de la red,8803,14,9.719,1.258,7.73,8803
-"Cuadrado, 1 000 puntos",1000,17,1.975,0.430,4.59,1000
-"Cuadrado, 10 000 puntos",10000,22,13.760,1.466,9.39,10000
-"Cuadrado, 50 000 puntos",50000,34,73.127,6.622,11.04,50000
+Nodos de la red,8803,14,11.720,2.954,3.97,8803
+"Cuadrado, 1 000 puntos",1000,17,1.584,1.871,0.85,1000
+"Cuadrado, 10 000 puntos",10000,22,16.554,2.864,5.78,10000
+"Cuadrado, 50 000 puntos",50000,34,90.188,7.600,11.87,50000

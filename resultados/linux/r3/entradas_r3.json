@@ -1,0 +1,70 @@
+{
+  "bbox_utm": {
+    "xmax": 446623,
+    "xmin": 401796,
+    "ymax": 520840,
+    "ymin": 464304
+  },
+  "conjuntos": {
+    "cuadrado_1000": {
+      "generados": 1000,
+      "huella_entrada": "d404914d1a397f603ee5d05cdc46b8465cef9394561a98295bd9538e8776fe5e",
+      "lado_cuadrado": 56536,
+      "n": 1000,
+      "nombre": "Cuadrado, 1 000 puntos",
+      "semilla_efectiva": 542,
+      "semilla_generacion": 542,
+      "vertices": 17,
+      "x0": 401796,
+      "y0": 464304
+    },
+    "cuadrado_10000": {
+      "generados": 10000,
+      "huella_entrada": "330ca76f90782666ade9938179c9f2070760d6a10fd1b3091c6a8acc66063862",
+      "lado_cuadrado": 56536,
+      "n": 10000,
+      "nombre": "Cuadrado, 10 000 puntos",
+      "semilla_efectiva": 543,
+      "semilla_generacion": 543,
+      "vertices": 22,
+      "x0": 401796,
+      "y0": 464304
+    },
+    "cuadrado_50000": {
+      "generados": 50000,
+      "huella_entrada": "45913011289acce7cf1632016b69ab78cf12d8f1fb3854656ae0d46919d1e2dd",
+      "lado_cuadrado": 56536,
+      "n": 50000,
+      "nombre": "Cuadrado, 50 000 puntos",
+      "semilla_efectiva": 544,
+      "semilla_generacion": 544,
+      "vertices": 34,
+      "x0": 401796,
+      "y0": 464304
+    },
+    "red": {
+      "generados": 8803,
+      "huella_entrada": "fc24873a8476e89c0e02bb2df1702d8584dca5f9e7865c0cf5988525c0dd6295",
+      "lado_cuadrado": null,
+      "n": 8803,
+      "nombre": "Nodos de la red",
+      "semilla_efectiva": 42,
+      "semilla_generacion": null,
+      "vertices": 14,
+      "vertices_archivo": 14,
+      "x0": null,
+      "y0": null
+    }
+  },
+  "dedup": "s\u00ed; n = puntos tras deduplicar, generados = antes (DA-18)",
+  "epsg": "EPSG:32618",
+  "formato_propio": "tupla de tuplas de int (Python)",
+  "formato_scipy": "ndarray int64 (n, 2)",
+  "indice_base": 500,
+  "lado_cuadrado": 56536,
+  "redondeo": "half-up de quindio.envolvente.quickhull.redondear_half_up (DA-18)",
+  "region_medida": "solo la envolvente: envolvente(pts) y ConvexHull(arr) sobre la entrada ya preparada (EXP-02, R3-07)",
+  "requerimiento": "R3",
+  "semilla_maestra": 42,
+  "spec": "specs/R3.md UT-08 (R3-07, R3-10, R3-11)"
+}
