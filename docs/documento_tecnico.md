@@ -1,7 +1,7 @@
 # Documento técnico — Red vial del Quindío, caminos mínimos, envolvente y ruta óptima
 
-> **Firmado:** David Posso, 2026-11-04. Revisión humana realizada; R5-13 (ejecución en limpio) queda como único pendiente registrado en §8.
-
+> **Revisado y aprobado por el grupo:** Juan Diego García Albarracín, David Alfonso Posso Cano y Sebastián David España García, 2026-11-16.
+> 
 Proyecto final de Análisis de Algoritmos. Todos los algoritmos evaluables son de
 implementación propia en Python puro; las bibliotecas externas solo se usan para
 preparar datos, graficar o verificar de forma independiente (GLOB-02, GLOB-03).
@@ -613,8 +613,6 @@ aceptó, rechazó o modificó y cómo se verificó) se mantiene en
 [`docs/uso_ia.md`](uso_ia.md), conforme a REPO-07 y GLOB-25. Este anexo lo
 redactan y firman personas; el agente no certifica el uso de IA.
 
-El registro de Juan Diego García (correcciones, mediciones en la máquina B y
-actualización del documento) está completo. Pendientes: registro de David Posso
-en `docs/uso_ia.md`, ejecución del README en un entorno limpio (R5-13) y nueva
-revisión y firma del documento por el grupo, porque cambió después de la firma
-del 2026-11-04 (REPO-11).
+Documento revisado y aprobado por el grupo el 2026-11-16. La ejecución de los
+pasos del README en un entorno limpio (R5-13) está registrada en
+`docs/entorno/ejecucion_limpia.md`.
